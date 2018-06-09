@@ -1,18 +1,16 @@
-all: dist/hoquet.js dist/lib/hoquet.js
+all: lib/hoquet.js hoquet.js
 
-dist:
-	mkdir dist
+lib/hoquet.js: lib node_modules
+	cp node_modules/hoquet/hoquet.js lib/
 
-dist/lib: dist
-	mkdir dist/lib
+node_modules:
+	yarn install
 
-dist/hoquet.js: dist
-	cp hoquet.js ./dist/
-
-dist/lib/hoquet.js: dist/lib
-	cp node_modules/hoquet/hoquet.js dist/lib/
+lib:
+	mkdir -p lib
 
 clean:
-	rm -r dist
+	rm -fr lib node_modules
 
 .PHONY: clean
+

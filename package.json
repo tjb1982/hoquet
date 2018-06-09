@@ -1,13 +1,21 @@
 {
   "name": "@pojagi/hoquet",
-  "version": "1.0.0",
-  "description": "Wrap HTMLElement with hoquet (s-expr templating language)",
+  "version": "1.0.3",
+  "description": "Wrap HTMLElement with hoquet (s-expr templating DSL).",
   "main": "hoquet.js",
-  "repository": "https://bitbucket.org/pojagi/hoquet",
-  "author": "Tom Brennan",
+  "repository": "git@bitbucket.org:pojagi/hoquet.git",
+  "author": "Tom Brennan <tjb1982@gmail.com>",
   "license": "MIT",
+  "private": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "lib",
+    "hoquet.js"
+  ],
   "dependencies": {
     "hoquet": "^3.0.2"
-  },
-  "devDependencies": {}
+  }
 }
