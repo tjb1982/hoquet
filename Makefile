@@ -12,5 +12,5 @@ lib:
 clean:
 	rm -fr lib node_modules
 
-.PHONY: clean
+.PHONY: clean all
 
