@@ -1,0 +1,20 @@
+<!doctype>
+<html>
+    <head>
+        <script type="module">
+        import Hoquet from "./dist/hoquet.js";
+        class MyElement extends Hoquet(HTMLElement) {
+            constructor() {
+                super();
+                this.render();
+            }
+
+            get template() { return "hello world"; }
+        }
+        customElements.define("my-element", MyElement);
+        </script>
+    </head>
+    <body>
+        <my-element></my-element>
+    </body>
+</html>

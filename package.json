@@ -1,0 +1,16 @@
+{
+  "name": "@pojagi/hoquet",
+  "version": "1.0.0",
+  "description": "Wrap HTMLElement with hoquet (s-expr templating language)",
+  "main": "hoquet.js",
+  "repository": "https://bitbucket.org/pojagi/hoquet",
+  "author": "Tom Brennan",
+  "license": "MIT",
+  "dependencies": {
+    "hoquet": "^3.0.2"
+  },
+  "devDependencies": {
+    "webpack": "^4.12.0",
+    "webpack-cli": "^3.0.3"
+  }
+}
