@@ -1,6 +1,6 @@
 {
   "name": "@pojagi/hoquet",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Wrap HTMLElement with hoquet (s-expr templating DSL).",
   "main": "hoquet.js",
   "repository": "git@bitbucket.org:pojagi/hoquet.git",
