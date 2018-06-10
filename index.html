@@ -1,15 +1,25 @@
 <!doctype>
 <html>
     <head>
+        <style>
+            .foo {
+                background: red;
+                height: 500px;
+            }
+        </style>
+
         <script type="module">
-        import Hoquet from "./dist/hoquet.js";
+        import Hoquet from "./hoquet.js";
         class MyElement extends Hoquet(HTMLElement) {
             constructor() {
                 super();
                 this.render();
+                this.importCSS(
+                    {src: null}
+                );
             }
 
-            get template() { return "hello world"; }
+            get template() { return `<h1 class="foo">hello world</h1>`; }
         }
         customElements.define("my-element", MyElement);
         </script>

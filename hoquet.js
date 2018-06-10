@@ -1,4 +1,6 @@
 import * as hoquet from "./lib/hoquet.js";
+import {importCSS} from "./utils.js";
+
 
 export default ((C) => class extends (C || null) {
 
@@ -38,6 +40,10 @@ export default ((C) => class extends (C || null) {
         this.constructor.replace(container, ["style", this.styles], this.template);
     }
 
+    importCSS(...sources) {
+        const styleSheet = this.shadowRoot.styleSheets[0];
+        return importCSS(sources).forEach(x => styleSheet.insertRule(x));
+    }
 });
 
 

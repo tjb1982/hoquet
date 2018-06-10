@@ -1,4 +1,4 @@
-all: lib/hoquet.js hoquet.js
+all: lib/hoquet.js
 
 lib/hoquet.js: lib node_modules
 	cp node_modules/hoquet/hoquet.js lib/
