@@ -87,5 +87,10 @@ function _render (a) {
 
 }
 
-export { render, renderElement, renderAttribute, renderAttributeValue };
+module.exports = Object.create(null, {
+    render: {value: render},
+    renderElement: {value: renderElement},
+    renderAttribute: {value: renderAttribute},
+    renderAttributeValue: {value: renderAttributeValue}
+});
 

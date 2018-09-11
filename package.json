@@ -1,9 +1,9 @@
 {
   "name": "@pojagi/hoquet",
-  "version": "1.0.5",
-  "description": "Wrap HTMLElement with hoquet (s-expr templating DSL).",
-  "main": "hoquet.js",
-  "repository": "git@bitbucket.org:pojagi/hoquet.git",
+  "version": "4.0.1",
+  "description": "JavaScript HTML templating with S-Expressions",
+  "main": "index.js",
+  "repository": "git@github.com/tjb1982/hoquet.git",
   "author": "Tom Brennan <tjb1982@gmail.com>",
   "license": "MIT",
   "private": false,
@@ -16,10 +16,12 @@
     "hoquet.js",
     "utils.js"
   ],
-  "dependencies": {
-    "hoquet": "^3.0.2"
-  },
   "devDependencies": {
-    "serve": "^8.1.2"
+    "chai": "*",
+    "mocha": "*",
+    "serve": "^10.0.0"
+  },
+  "scripts": {
+    "test": "mocha --reporter spec"
   }
 }
