@@ -41,6 +41,8 @@ export default ((C) => class extends (C || null) {
     }
 
     importCSS(...sources) {
+        // Assume we want to affect only the stylesheet this mixin created
+        // when `render` was called.
         const styleSheet = this.shadowRoot.styleSheets[0];
         return importCSS(sources).forEach(x => styleSheet.insertRule(x));
     }

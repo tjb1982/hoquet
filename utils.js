@@ -2,12 +2,11 @@ const _anchor = document.createElement("a");
 
 const absolutePath = (src) => {
     _anchor.href = src;
-    return src === null ? src : _anchor.href;
+    return !src ? null : _anchor.href;
 }
 
-const styleSheets = Array.from(document.styleSheets);
-
 const importCSS = (sources) => {
+    const styleSheets = document.styleSheets;
     let matchingRules = [], i, j, k, l;
 
     for (i = 0; i < sources.length; i++) {
@@ -23,14 +22,12 @@ const importCSS = (sources) => {
                 } else {
                     for (k = 0; k < rules.length; k++) {
                         const rule = rules[k];
-                        if (!tests) {
-                            matchingRules.push(rule.cssText);
-                        } else {
-                            for (l = 0; l < tests.length; l++) {
-                                const test = tests[l];
-                                if (rule.selectorText.match(test)) {
-                                    matchingRules.push(rule.cssText)
-                                }
+                        const selectorText = rule.selectorText;
+
+                        for (l = 0; l < tests.length; l++) {
+                            const test = tests[l];
+                            if (!selectorText || selectorText.match(test)) {
+                                matchingRules.push(rule.cssText)
                             }
                         }
                     }
