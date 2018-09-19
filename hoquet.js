@@ -13,7 +13,7 @@ function isNumber(n) {
 }
 
 function isInvalidTagName(tester) {
-    return !tester || typeof tester !== "string" || isNumber(tester[0]);
+    return !tester || tester !== String(tester) || isNumber(tester[0]);
 }
 
 function renderAttributeValue(form, key) {
