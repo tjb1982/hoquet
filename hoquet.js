@@ -5,7 +5,7 @@ function render(a) {
 
 function isPrintable(tester) {
     // empty string must be okay here.
-    return typeof tester === "string" || tester && isNumber(tester);
+    return tester === String(tester) || tester && isNumber(tester);
 }
 
 function isNumber(n) {
@@ -17,7 +17,7 @@ function isInvalidTagName(tester) {
 }
 
 function renderAttributeValue(form, key) {
-    return form[key] instanceof Array ? form[key].join(" ") : form[key];
+    return Array.isArray(form[key]) ? form[key].join(" ") : form[key];
 }
 
 function renderAttribute(form, key) {
@@ -38,13 +38,13 @@ function renderElement(a, selfClosing) {
         a.map(function(form, i) {
             return i < 1
                 ? "<" + form
-                : i === 1 && form instanceof Object && !(form instanceof Array)
+                : i === 1 && form === Object(form) && !Array.isArray(form)
                 ? [
                     Object.keys(form).map(key => renderAttribute(form, key)).join(""),
                     (!selfClosing ? ">" : "")
                 ].join("")
                 : (i === 1 && !selfClosing ? ">" : "") + (
-                    form instanceof Array && form.length ? _render(form)
+                    Array.isArray(form) && form.length ? _render(form)
                     : isPrintable(form) ? form : ""
                 );
         }).join(""),
@@ -66,6 +66,9 @@ class InvalidTagName extends Error {
             JSON.stringify(x)
         }`;
     }
+    static throw() {
+        throw new InvalidTagName(...arguments);
+    }
 }
 
 function _render (a) {
@@ -74,7 +77,7 @@ function _render (a) {
     : !Array.isArray(a) ? ""
     : Array.isArray(a[0]) ? a.map(_render, this).join("")
     : isInvalidTagName(a[0])
-    ? new InvalidTagName(a)
+    ? InvalidTagName.throw(a)
     : (function(last) {
         return renderElement(
             a,

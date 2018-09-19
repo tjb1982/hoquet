@@ -78,15 +78,18 @@ describe('hoquet.render', function() {
         [[undefined,'baz'], "undefined"],
         [[{}, 'far'], "object", "[object Object]"]
     ];
+    let caught;
+
     invalids.forEach(x => {
-        expect(hoquet.render([x[0]])).to.equal(
-            `InvalidTagName: ${
-                JSON.stringify(x[0][0])
-            } (having type ${
-                JSON.stringify(x[1])
-            }) is not a valid tag name. Context: ${JSON.stringify(x[0])}`
-        );
+        try {
+            hoquet.render([x[0]]);
+            expect(false).to.equal(true);
+        } catch(e) {
+            caught = e;
+        }
+        expect(caught).to.be.an("Error");
     });
+
     expect(hoquet.render([
       'p', {}, [], null, undefined, null + undefined, false, {}, 'foo', []
     ])).to.equal(
@@ -95,7 +98,10 @@ describe('hoquet.render', function() {
   });
 
   it('should be an error if the tagname is invalid', function() {
-    expect(hoquet.render([2, "foo"])).to.be.an("Error");
+    let caught;
+    try { hoquet.render([2, "foo"]) }
+    catch (e) { caught = e }
+    expect(caught).to.be.an("Error");
   });
 
   it('should handle self-closing elements by assuming elements without content are self-closing, e.g. ["meta"] or ["meta", {foo: "bar"}],  not ["meta", undefined/false/null/[]/{}]', function() {
