@@ -6,11 +6,11 @@ import { render } from "./hoquet.js";
 
 const things = ["bread", "milk", "eggs"];
 render(
-  ["ul"
+  ["ul", {class: ["things", "list"]}
   , things.map(x => ["li", x])
   ]
 );
-// <ul><li>bread</li><li>milk</li><li>eggs</li></ul>
+// <ul class="things list"><li>bread</li><li>milk</li><li>eggs</li></ul>
 
 render(
   ["link", {rel: "stylesheet", href: "styles.css"}]
