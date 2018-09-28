@@ -60,7 +60,6 @@ class TodoItem extends Hoquet(HTMLElement) {
         cursor: pointer;
         list-style: none;
         padding: 10px 15px;
-        background-color: #fff9d4;
         background-color: #fafafa;
         border: 1px solid #ff0;
         margin: 5px 0;
