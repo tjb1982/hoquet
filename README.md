@@ -1,7 +1,7 @@
 # hoquet
 Simple JavaScript templating using Arrays as S-expressions (loosely based on Clojure's Hiccup).
 
-## Todo app example (using the web component mixin)
+## Example: todo app (using the web component mixin)
 
 ```javascript
 import Hoquet from "./mixin.js";
