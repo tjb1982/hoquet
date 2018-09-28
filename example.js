@@ -107,12 +107,8 @@ class TodoList extends Hoquet(HTMLElement) {
     });
   }
 
-  item(item) {
-    return new TodoItem(item);
-  }
-
   addItem(item) {
-    this.$list.appendChild(this.item(item));
+    this.$list.appendChild(new TodoItem(item));
   }
 
   get template() {
