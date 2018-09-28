@@ -1,4 +1,4 @@
-import * as hoquet from "./hoquet.js";
+import * as _hoquet from "./hoquet.js";
 import {importCSS} from "./utils.js";
 
 
@@ -9,7 +9,7 @@ export default ((C) => class extends (C || null) {
         this.attachShadow({mode:"open"});
     }
 
-    static get hoquet() { return hoquet; }
+    static get hoquet() { return _hoquet; }
     
     get template() {}
     get styles() {}
