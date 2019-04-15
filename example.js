@@ -84,27 +84,44 @@ class TodoItem extends Hoquet(HTMLElement) {
   }
 }
 
+let _placeholder;
+
 class TodoList extends Hoquet(HTMLElement) {
-  constructor() {
+  constructor(placeholder) {
     super();
-    this.render();
+    this.placeholder = placeholder;
+    this.bind();
+  }
 
-    this.shadowSelect(
-      ["$list", "list"],
-      ["$input", "new-todo"]
-    );
-
+  bind() {
     this.addEventListener("keyup", (e) => {
       switch (e.key) {
       case "Enter":
-        this.addItem({name: this.$input.value, state: "todo"});
+        this.$input.value && this.addItem({name: this.$input.value, state: "todo"});
         this.$input.value = null;
         break;
       }
     });
+
     this.shadowRoot.addEventListener("item-deleted", (e) => {
       this.$list.removeChild(e.target);
     });
+  }
+
+  static get observedAttributes() { return ["placeholder"]; }
+  attributeChangedCallback(name, oldv, newv) {
+    if (name === "placeholder" && newv) {
+      this.placeholder = newv;
+    }
+  }
+
+  set placeholder(x) {
+      _placeholder = x;
+      this.render();
+      this.shadowSelect(
+        ["$list", "list"],
+        ["$input", "new-todo"]
+      );
   }
 
   addItem(item) {
@@ -114,8 +131,8 @@ class TodoList extends Hoquet(HTMLElement) {
   get template() {
     return (
       ["div"
-      , ["input", {id: "new-todo", type: "text", placeholder: "Enter a todo item"}]
-      , ["ul", {id: "list"}, ""]
+      , ["input", {id: "new-todo", type: "text", placeholder: _placeholder}]
+      , ["ul", {id: "list"}, null]
       ]
     );
   }
