@@ -2,11 +2,12 @@ import * as _hoquet from "./hoquet.js";
 import {importCSS} from "./utils.js";
 
 
-export default ((C) => class extends (C || null) {
+export default ((C, shadowy=true) => class extends (C || null) {
 
     constructor() {
         super();
-        this.attachShadow({mode:"open"});
+        if (shadowy)
+            this.attachShadow({mode:"open"});
     }
 
     get hoquet() { return _hoquet; }
