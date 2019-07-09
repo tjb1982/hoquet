@@ -6,25 +6,31 @@ export default ((C, shadowy=true) => class extends (C || null) {
 
     constructor() {
         super();
-        if (shadowy)
+        if (shadowy) {
             this.attachShadow({mode:"open"});
+            this.$container = this.shadowRoot;
+        } else {
+            this.$container = this;
+        }
     }
 
     get hoquet() { return _hoquet; }
     get template() {}
     get styles() {}
 
-    select(container, ...selectors) {
+    getElementById(id) {
+        return this.shadowRoot
+            ? this.shadowRoot.getElementById(id)
+            : this.querySelector(`#${id}`);
+    }
+
+    select(...selectors) {
         selectors.forEach((x) => {
             Object.defineProperty(this, x[0], {
-                value: container[x[2] || "getElementById"](x[1]),
+                value: this.$container[x[2] || "getElementById"](x[1]),
                 writable: true
             });
         });
-    }
-
-    shadowSelect(...selectors) {
-        this.select(this.shadowRoot, ...selectors);
     }
 
     fragment(...sources) {
@@ -40,16 +46,10 @@ export default ((C, shadowy=true) => class extends (C || null) {
         container.appendChild(this.fragment(...sources));
     }
 
-    render(container = this.shadowRoot) {
-        this.replace(container, ["style", this.styles], this.template);
+    render() {
+        this.replace(this.$container, ["style", this.styles], this.template);
     }
 
-    importCSS(...sources) {
-        // Assume we want to affect only the stylesheet this mixin created
-        // when `render` was called.
-        const styleSheet = this.shadowRoot.styleSheets[0];
-        return styleSheet && importCSS(sources).forEach(x => styleSheet.insertRule(x));
-    }
 });
 
 
