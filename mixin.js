@@ -2,10 +2,10 @@ import * as _hoquet from "./hoquet.js";
 import {importCSS} from "./utils.js";
 
 
-export default ((C, shadowy=true) => class extends (C || null) {
+export default ((C = null, shadowy=true) => class extends (C) {
 
-    constructor() {
-        super();
+    constructor(...args) {
+        super(...args);
         if (shadowy) {
             this.attachShadow({mode:"open"});
             this.$container = this.shadowRoot;
@@ -25,8 +25,15 @@ export default ((C, shadowy=true) => class extends (C || null) {
     }
 
     select(...selectors) {
+        let obj = this;
         selectors.forEach((x) => {
-            Object.defineProperty(this, x[0], {
+            if (x.length === 1) {
+                if (typeof this.$ === "undefined")
+                    Object.defineProperty(this, "$", {value: {}});
+                obj = this.$;
+                x[1] = x[0];
+            }
+            Object.defineProperty(obj, x[0], {
                 value: this.$container[x[2] || "getElementById"](x[1]),
                 writable: true
             });
