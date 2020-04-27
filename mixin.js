@@ -2,16 +2,33 @@ import * as _hoquet from "./hoquet.js";
 import {importCSS} from "./utils.js";
 
 
+const renderStrategy = Object.create(null, {
+    REPLACE: {value: 1},
+    APPEND: {value: 2},
+    PREPEND: {value: 3}
+});
+
+
+let __container;
+
+
 export default ((C = null, shadowy=true) => class extends (C) {
+
+    static get renderStrategy() { return renderStrategy; }
 
     constructor(...args) {
         super(...args);
         if (shadowy) {
             this.attachShadow({mode:"open"});
-            this.$container = this.shadowRoot;
+            __container = this.shadowRoot;
         } else {
-            this.$container = this;
+            __container = this;
         }
+
+        // Safer "static" property that can't be overrided
+        Object.defineProperty(this.constructor, "renderStrategy", {
+            value: renderStrategy
+        });
     }
 
     get hoquet() { return _hoquet; }
@@ -34,7 +51,7 @@ export default ((C = null, shadowy=true) => class extends (C) {
                 x[1] = x[0];
             }
             Object.defineProperty(obj, x[0], {
-                value: this.$container[x[2] || "getElementById"](x[1]),
+                value: __container[x[2] || "getElementById"](x[1]),
                 writable: true
             });
         });
@@ -53,8 +70,22 @@ export default ((C = null, shadowy=true) => class extends (C) {
         container.appendChild(this.fragment(...sources));
     }
 
-    render() {
-        this.replace(this.$container, ["style", this.styles], this.template);
+    render(strategy = renderStrategy.REPLACE) {
+        switch (strategy) {
+        case renderStrategy.APPEND:
+            __container.appendChild(this.fragment(["style", this.styles], this.template));
+            break;
+        case renderStrategy.PREPEND:
+            __container.insertBefore(
+                this.fragment(["style", this.styles], this.template),
+                __container.firstChild
+            );
+            break;
+        case renderStrategy.REPLACE:
+        default:
+            this.replace(__container, ["style", this.styles], this.template);
+            break;
+        }
     }
 
 });

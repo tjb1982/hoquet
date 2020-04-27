@@ -8,7 +8,7 @@ class TodoItem extends Hoquet(HTMLElement) {
     this.name = name;
     this.render();
 
-    this.shadowSelect(
+    this.select(
       ["$li", "li", "querySelector"]
     , ["$x", "x"]
     );
@@ -118,7 +118,7 @@ class TodoList extends Hoquet(HTMLElement) {
   set placeholder(x) {
       _placeholder = x;
       this.render();
-      this.shadowSelect(
+      this.select(
         ["$list", "list"],
         ["$input", "new-todo"]
       );
