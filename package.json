@@ -1,6 +1,6 @@
 {
   "name": "@pojagi/hoquet",
-  "version": "6.1.2",
+  "version": "6.1.3",
   "description": "JavaScript HTML templating with S-Expressions",
   "main": "index.js",
   "repository": "git@github.com/tjb1982/hoquet.git",

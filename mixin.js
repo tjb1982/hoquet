@@ -40,10 +40,10 @@ export default ((C = null, shadowy=true) => class extends (C) {
     }
 
     select(...configs) {
-        let obj = this;
         configs.forEach(config => {
             const configIsNotArray = !Array.isArray(config);
             let [propName, selector, method] = config;
+            let obj = this;
 
             if (configIsNotArray || config.length === 1) {
                 if (this.$ === void(0))
