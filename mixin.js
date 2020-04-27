@@ -9,9 +9,6 @@ const renderStrategy = Object.create(null, {
 });
 
 
-let __container;
-
-
 export default ((C = null, shadowy=true) => class extends (C) {
 
     static get renderStrategy() { return renderStrategy; }
@@ -20,9 +17,9 @@ export default ((C = null, shadowy=true) => class extends (C) {
         super(...args);
         if (shadowy) {
             this.attachShadow({mode:"open"});
-            __container = this.shadowRoot;
+            this.__container = this.shadowRoot;
         } else {
-            __container = this;
+            this.__container = this;
         }
 
         // Safer "static" property that can't be overrided
@@ -36,22 +33,28 @@ export default ((C = null, shadowy=true) => class extends (C) {
     get styles() {}
 
     getElementById(id) {
-        return this.shadowRoot
-            ? this.shadowRoot.getElementById(id)
-            : this.querySelector(`#${id}`);
+        const container = this.__container;
+        return container === this.shadowRoot
+            ? container.getElementById(id)
+            : container.querySelector(`#${id}`);
     }
 
-    select(...selectors) {
+    select(...configs) {
         let obj = this;
-        selectors.forEach((x) => {
-            if (x.length === 1) {
-                if (typeof this.$ === "undefined")
+        configs.forEach(config => {
+            const configIsNotArray = !Array.isArray(config);
+            let [propName, selector, method] = config;
+
+            if (configIsNotArray || config.length === 1) {
+                if (this.$ === void(0))
                     Object.defineProperty(this, "$", {value: {}});
                 obj = this.$;
-                x[1] = x[0];
+                selector = propName = configIsNotArray ? config : propName;
+                method = void(0);
             }
-            Object.defineProperty(obj, x[0], {
-                value: __container[x[2] || "getElementById"](x[1]),
+
+            Object.defineProperty(obj, propName, {
+                value: this.__container[method || "getElementById"](selector),
                 writable: true
             });
         });
@@ -73,17 +76,17 @@ export default ((C = null, shadowy=true) => class extends (C) {
     render(strategy = renderStrategy.REPLACE) {
         switch (strategy) {
         case renderStrategy.APPEND:
-            __container.appendChild(this.fragment(["style", this.styles], this.template));
+            this.__container.appendChild(this.fragment(["style", this.styles], this.template));
             break;
         case renderStrategy.PREPEND:
-            __container.insertBefore(
+            this.__container.insertBefore(
                 this.fragment(["style", this.styles], this.template),
-                __container.firstChild
+                this.__container.firstChild
             );
             break;
         case renderStrategy.REPLACE:
         default:
-            this.replace(__container, ["style", this.styles], this.template);
+            this.replace(this.__container, ["style", this.styles], this.template);
             break;
         }
     }
