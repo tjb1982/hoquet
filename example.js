@@ -2,6 +2,7 @@ import Hoquet from "./mixin.js";
 
 const states = ["todo", "doing", "done"];
 
+
 class TodoItem extends Hoquet(HTMLElement) {
   constructor({name, state}) {
     super();
@@ -9,14 +10,14 @@ class TodoItem extends Hoquet(HTMLElement) {
     this.render();
 
     this.select(
-      ["$li", "li", "querySelector"]
-    , ["$x", "x"]
+        "x",
+        ["$li", "li", "querySelector"]
     );
 
     this.state = state;
 
     this.$li.addEventListener("click", e => this.toggleState());
-    this.$x.addEventListener("click", e => {
+    this.$["x"].addEventListener("click", e => {
       e.stopPropagation();
       this.dispatchEvent(new CustomEvent("item-deleted", {
         composed: true, bubbles: true, detail: {}
@@ -84,12 +85,15 @@ class TodoItem extends Hoquet(HTMLElement) {
   }
 }
 
-let _placeholder;
+const reflect = {
+    placeholder: "Default placeholder..."
+};
 
-class TodoList extends Hoquet(HTMLElement) {
-  constructor(placeholder) {
+class TodoList extends Hoquet(HTMLElement, {reflect}) {
+  constructor() {
     super();
-    this.placeholder = placeholder;
+    this.render();
+    this.select("list", "new-todo");
     this.bind();
   }
 
@@ -97,41 +101,25 @@ class TodoList extends Hoquet(HTMLElement) {
     this.addEventListener("keyup", (e) => {
       switch (e.key) {
       case "Enter":
-        this.$input.value && this.addItem({name: this.$input.value, state: "todo"});
-        this.$input.value = null;
+        this.$["new-todo"].value && this.addItem({name: this.$["new-todo"].value, state: "todo"});
+        this.$["new-todo"].value = null;
         break;
       }
     });
 
     this.shadowRoot.addEventListener("item-deleted", (e) => {
-      this.$list.removeChild(e.target);
+      this.$["list"].removeChild(e.target);
     });
   }
 
-  static get observedAttributes() { return ["placeholder"]; }
-  attributeChangedCallback(name, oldv, newv) {
-    if (name === "placeholder" && newv) {
-      this.placeholder = newv;
-    }
-  }
-
-  set placeholder(x) {
-      _placeholder = x;
-      this.render();
-      this.select(
-        ["$list", "list"],
-        ["$input", "new-todo"]
-      );
-  }
-
   addItem(item) {
-    this.$list.appendChild(new TodoItem(item));
+    this.$["list"].appendChild(new TodoItem(item));
   }
 
   get template() {
     return (
       ["div"
-      , ["input", {id: "new-todo", type: "text", placeholder: _placeholder}]
+      , ["input", {id: "new-todo", type: "text", placeholder: this.placeholder}]
       , ["ul", {id: "list"}, null]
       ]
     );
@@ -146,5 +134,8 @@ class TodoList extends Hoquet(HTMLElement) {
 
 }
 
+window.Hoquet = Hoquet;
+window.TodoList = TodoList;
+window.TodoItem = TodoItem;
 window.customElements.define("todo-list", TodoList);
 window.customElements.define("todo-item", TodoItem);
