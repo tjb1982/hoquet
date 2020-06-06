@@ -17,6 +17,7 @@ export default ((C = null, {shadowy = true, reflect = {}} = {}) => {
     class A extends (C) {
 
         static get renderStrategy() { return renderStrategy; }
+        static get reflectedAttributes() { return []; }
 
         constructor(...args) {
             super(...args);
@@ -27,10 +28,10 @@ export default ((C = null, {shadowy = true, reflect = {}} = {}) => {
                 this[_container] = this;
             }
 
-            Object.entries(reflect).forEach(([k, v]) => {
+            this.constructor.reflectedAttributes.forEach(k => {
                 Object.defineProperty(this, k, {
                     get: () => {
-                        return this.getAttribute(k) || v;
+                        return this.getAttribute(k);
                     },
                     set: (value) => {
                         this.setAttribute(k, value);

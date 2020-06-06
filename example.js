@@ -85,13 +85,14 @@ class TodoItem extends Hoquet(HTMLElement) {
   }
 }
 
-const reflect = {
-    placeholder: "Default placeholder..."
-};
 
-class TodoList extends Hoquet(HTMLElement, {reflect}) {
+class TodoList extends Hoquet(HTMLElement) {
+
+  static get reflectedAttributes() { return ["placeholder"]; }
+
   constructor() {
     super();
+    this.placeholder = this.placeholder || "Default placeholder...";
     this.render();
     this.select("list", "new-todo");
     this.bind();
