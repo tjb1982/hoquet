@@ -102,7 +102,10 @@ class TodoList extends Hoquet(HTMLElement) {
     this.addEventListener("keyup", (e) => {
       switch (e.key) {
       case "Enter":
-        this.$["new-todo"].value && this.addItem({name: this.$["new-todo"].value, state: "todo"});
+        this.$["new-todo"].value && this.addItem({
+            name: this.$["new-todo"].value,
+            state: "todo"
+        });
         this.$["new-todo"].value = null;
         break;
       }
