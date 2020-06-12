@@ -99,7 +99,6 @@ class TodoList extends Hoquet(HTMLElement) {
     constructor() {
         super();
         this.placeholder = this.placeholder || "Default placeholder...";
-        console.log(this.placeholder);
         this.render();
         this.select("list", "new-todo");
         this.bind();

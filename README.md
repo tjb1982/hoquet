@@ -38,7 +38,6 @@ class TodoList extends Hoquet(HTMLElement) {
         }
     }
 
-
     constructor() {
         super();
         this.placeholder = this.placeholder || "Default placeholder...";
@@ -87,10 +86,60 @@ class TodoList extends Hoquet(HTMLElement) {
             #new-todo { font-size: 2rem; margin: 0; padding: 0; width: 100%; }
         `;
     }
+}
 
+
+class TodoItem extends Hoquet(HTMLElement) {
+    constructor({name, state}) {
+        super();
+        this.name = name;
+        this.render();
+
+        this.select(
+                "x",
+                ["$li", "li", "querySelector"]
+        );
+
+        this.state = state;
+
+        this.$li.addEventListener("click", e => this.toggleState());
+        this.$["x"].addEventListener("click", e => {
+            e.stopPropagation();
+            this.dispatchEvent(new CustomEvent("item-deleted", {
+                composed: true, bubbles: true, detail: {item: this}
+            }));
+        });
+    }
+
+    get state() { return this._state }
+    set state(state) {
+        this._state = state;
+        states.forEach(x => this.$li.classList.remove(x));
+        this.$li.classList.add(state);
+    }
+
+    toggleState() {
+        const currentStateIndex = states.indexOf(this.state);
+        this.state = states[
+            currentStateIndex >= states.length - 1
+                ? 0 : currentStateIndex + 1
+        ];
+    }
+
+    get template() {
+        return (
+            ["li"
+            , ["span", {class: "name"}, this.name]
+            , ["span", {id: "x"}, "x"]
+            ]
+        );
+    }
+
+    get styles() { return // "..." }
 }
 
 window.customElements.define("todo-list", TodoList);
+window.customElements.define("todo-item", TodoItem);
 ```
 
 ```html
