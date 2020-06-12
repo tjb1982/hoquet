@@ -77,11 +77,20 @@ class TodoList extends Hoquet(HTMLElement) {
     }
 
     get template() {
-        return (
-            ["div",
-             ["input", {id: "new-todo", type: "text", placeholder: this.placeholder}],
-             ["ul", {id: "list"}, null]]
-        );
+        // optionally return a string instead of structured form
+        return `
+        <div>
+            <input id="new-todo" type="text" placeholder=${this.placeholder}>
+            <ul id="list"></ul>
+        </div>
+        `;
+
+        // i.e., 
+        //return (
+        //    ["div",
+        //     ["input", {id: "new-todo", type: "text", placeholder: this.placeholder}],
+        //     ["ul", {id: "list"}, null]]
+        //);
     }
 
     get styles() {
