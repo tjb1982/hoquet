@@ -26,6 +26,9 @@ render(
 import Hoquet from "@pojagi/hoquet/mixin";
 
 
+const states = ["todo", "doing", "done"];
+
+
 class TodoList extends Hoquet(HTMLElement) {
 
     // Reflect attributes as properties
