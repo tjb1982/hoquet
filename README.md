@@ -1,7 +1,7 @@
 # hoquet
 Minimal web components framework with JavaScript HTML/XML templating using Arrays as S-expressions (loosely based on Clojure's Hiccup).
 
-## Basic usage
+## Templating DSL basic usage
 
 ```javascript
 import { render } from "./hoquet.js";
@@ -106,6 +106,6 @@ window.customElements.define("todo-list", TodoList);
 You can see an example todo app using the web component mixin by running the "demo" script from the top level of the repo using npm/yarn.
 
 ```bash
-$ npm install && npm demo
+$ npm install && npm run demo
 ```
 
