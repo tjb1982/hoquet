@@ -4,7 +4,8 @@ Minimal web components framework with JavaScript HTML/XML templating using Array
 ## Templating DSL basic usage
 
 ```javascript
-import { render } from "./hoquet.js";
+import { render } from "@pojagi/hoquet/hoquet";
+
 
 const things = ["bread", "milk", "eggs"];
 render(
