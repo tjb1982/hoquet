@@ -124,11 +124,13 @@ class TodoItem extends Hoquet(HTMLElement) {
         });
     }
 
-    get state() { return this._state }
-    set state(state) {
-        this._state = state;
-        states.forEach(x => this.$li.classList.remove(x));
-        this.$li.classList.add(state);
+    static get reflectedAttributes() { return ["state"]; }
+    static get observedAttributes() { return ["state"]; }
+    attributeChangedCallback(k, prev, curr) {
+        if (k === "state") {
+            states.forEach(x => this.$li.classList.remove(x));
+            this.$li.classList.add(curr);
+        }
     }
 
     toggleState() {
