@@ -12,7 +12,7 @@ const _container = "f1c1d5a2-a012-4cdf-ade9-365935290f88";
 const __container = "e9312871-6a6a-4227-9cda-00cbd67d397f";
 
 
-export default ((C = null, {shadowy = true, reflect = {}} = {}) => {
+export default ((C = null, {shadowy = true} = {}) => {
 
     class A extends (C) {
 
