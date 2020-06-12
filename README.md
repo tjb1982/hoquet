@@ -46,7 +46,7 @@ class TodoList extends Hoquet(HTMLElement) {
         // Render when appropriate
         this.render();
 
-        // i.e., this[name] = this.shadowRoot.getElementById(name)
+        // i.e., this.$[name] = this.shadowRoot.getElementById(name)
         this.select("list", "new-todo");
         this.bind();
     }
