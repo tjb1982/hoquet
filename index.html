@@ -8,7 +8,25 @@
     <body>
         Using "placeholder" attribute:
         <todo-list placeholder="What do you want to do?"></todo-list>
+
+        <br/>
+
         Using reflected default placeholder:
-        <todo-list></todo-list>
+        <todo-list id="reflected"></todo-list>
+        <script>
+            document.addEventListener("DOMContentLoaded", _ => {
+                const $tl = document.getElementById("reflected");
+                const choices = [
+                    $tl.placeholder,
+                    "Next thing to do...",
+                    "What should we do...",
+                    "Type some text here...",
+                    "Enter an item in the shopping list..."
+                ];
+                setInterval(_ => {
+                    $tl.placeholder = choices[Math.floor(Math.random() * choices.length)];
+                }, 1000);
+            });
+        </script>
     </body>
 </html>
