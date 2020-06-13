@@ -35,7 +35,8 @@ export default ((C = null, {shadowy = true} = {}) => {
                     },
                     set: (value) => {
                         this.setAttribute(k, value);
-                    }
+                    },
+                    enumerable: true
                 });
             });
         }
