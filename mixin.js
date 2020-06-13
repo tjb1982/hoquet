@@ -34,7 +34,12 @@ export default ((C = null, {shadowy = true} = {}) => {
                         return this.getAttribute(k);
                     },
                     set: (value) => {
-                        this.setAttribute(k, value);
+                        if (value === true)
+                            this.setAttribute(k, "");
+                        else if (!value)
+                            this.removeAttribute(k);
+                        else
+                            this.setAttribute(k, value);
                     },
                     enumerable: true
                 });
