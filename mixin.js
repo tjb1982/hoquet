@@ -31,7 +31,10 @@ export default ((C = null, {shadowy = true} = {}) => {
             this.constructor.reflectedAttributes.forEach(k => {
                 Object.defineProperty(this, k, {
                     get: () => {
-                        return this.getAttribute(k);
+                        const val = this.getAttribute(k);
+                        return val === "" ? true
+                            : !val ? false
+                            : val;
                     },
                     set: (value) => {
                         if (value === true)
