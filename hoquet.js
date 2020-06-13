@@ -3,9 +3,9 @@ function render(a) {
     : Array.prototype.map.call(arguments, _render, this).join("");
 };
 
-function isPrintable(tester) {
+function canConcatenate(tester) {
     // empty string must be okay here.
-    return tester === String(tester) || tester && isNumber(tester);
+    return tester === String(tester) || (tester && isNumber(tester));
 }
 
 function isNumber(n) {
@@ -16,44 +16,67 @@ function isInvalidTagName(tester) {
     return !tester || tester !== String(tester) || isNumber(tester[0]);
 }
 
-function renderAttributeValue(form, key) {
-    return Array.isArray(form[key]) ? form[key].join(" ") : form[key];
+function json_btoa(x) {
+    const json = JSON.stringify(x);
+    try {
+        return btoa(json);
+    } catch (e) {
+        return Buffer.from(json).toString("base64");
+    }
 }
 
-function renderAttribute(form, key) {
-    return form[key] === true
-    ? [" ", key].join("")
-    : form[key] ? [
-        " ",
-        key,
-        "=",
-        "\"", renderAttributeValue(form, key), "\""
-    ].join("")
+function renderAttributeValue(val) {
+    return Array.isArray(val)
+        ? val.join(" ")
+        : canConcatenate(val)
+        ? val
+        : json_btoa(JSON.stringify(val));
+}
+
+function renderAttribute([k, v]) {
+    return v === true
+    ? k
+    : v ? [k, "=", "\"", renderAttributeValue(v), "\""].join("")
     : null;
 }
 
-function renderElement(a, selfClosing) {
+function renderAttributes(form) {
+    const attrs = form === Object(form)
+        ? Object.entries(form).map(renderAttribute).filter(x => x)
+        : "";
+    return attrs.length
+        ? [" ", attrs.join(" ")].join("")
+        : "";
+}
 
+function renderRest(form) {
+    return Array.isArray(form) && form.length
+        ? _render(form)
+        : canConcatenate(form) ? form
+        : "";
+}
+
+function renderSecondPosition(form, selfClosing) {
+    const closer = selfClosing ? "" : ">";
+    const rest = renderRest(form);
+    return (
+        rest
+            ? [closer, rest]
+            : [renderAttributes(form), closer]
+    ).join("");
+}
+
+function renderElement(a, selfClosing) {
     return [
         a.map(function(form, i) {
             return i < 1
                 ? "<" + form
-                : i === 1 && form === Object(form) && !Array.isArray(form)
-                ? [
-                    Object.keys(form).map(key => renderAttribute(form, key)).join(""),
-                    (!selfClosing ? ">" : "")
-                ].join("")
-                : (i === 1 && !selfClosing ? ">" : "") + (
-                    Array.isArray(form) && form.length ? _render(form)
-                    : isPrintable(form) ? form : ""
-                );
+                : i === 1
+                ? renderSecondPosition(form, selfClosing)
+                : renderRest(form, selfClosing);
         }).join(""),
-        (
-            !selfClosing ? "</" + a[0] + ">"
-            : " />"
-        )
+        !selfClosing ? "</" + a[0] + ">" : " />"
     ].join("");
-
 }
 
 class InvalidTagName extends Error {
@@ -73,7 +96,7 @@ class InvalidTagName extends Error {
 
 function _render (a) {
 
-    return isPrintable(a) ? a
+    return canConcatenate(a) ? a
     : !Array.isArray(a) ? ""
     : Array.isArray(a[0]) ? a.map(_render, this).join("")
     : isInvalidTagName(a[0])
@@ -84,11 +107,11 @@ function _render (a) {
             a.length > 2 ? false
             : typeof last === "undefined" ? false
             : Array.isArray(last) ? false
-            : !isPrintable(last)
+            : !canConcatenate(last)
         );
     })(a.length > 1 && a[a.length - 1]);
 
 }
 
-export { render, renderElement, renderAttribute, renderAttributeValue };
+export { render, renderElement, renderAttributes, renderAttribute, renderAttributeValue };
 

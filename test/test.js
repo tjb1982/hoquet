@@ -41,6 +41,15 @@ describe('hoquet.render', function() {
   it('should add attributes to the HTML elements by putting an object in second position only, like this: ["p", {class: "foo"}, "bar"]', function() {
     expect(hoquet.render(['p', {class:'foo'}, 'bar'])).to.equal('<p class="foo">bar</p>');
     expect(hoquet.render(['p', 'foo', {class: 'bar'}])).to.equal('<p>foo</p>');
+    expect(hoquet.render(['p', {foo: "bar", baz: "quux"}, ''])).to.equal('<p foo="bar" baz="quux"></p>');
+    expect(hoquet.render(['p', {foo: "bar", baz: true}, ''])).to.equal('<p foo="bar" baz></p>');
+    expect(hoquet.render(['p', {foo: true, baz: true}, ''])).to.equal('<p foo baz></p>');
+    expect(hoquet.render(['p', {foo: true, baz: "quux"}, ''])).to.equal('<p foo baz="quux"></p>');
+    expect(hoquet.render(['p', {foo: true, baz: void(0)}, ''])).to.equal('<p foo></p>');
+    expect(hoquet.render(['p', {foo: true, baz: false + ""}, ''])).to.equal('<p foo baz="false"></p>');
+    expect(hoquet.render(['p', {foo: true, baz: {lala: "lala"}}, ''])).to.equal(
+        '<p foo baz="IntcImxhbGFcIjpcImxhbGFcIn0i"></p>'
+    );
   });
 
   it('should not print attributes set explicitly to false', function() {
