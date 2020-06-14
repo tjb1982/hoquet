@@ -30,11 +30,6 @@ class TodoList extends Hoquet(HTMLElement) {
         this.bind();
     }
 
-    connectedCallback() {
-        // XXX: This works but it's not ideal
-        //this.placeholder = this.placeholder || "Default placeholder...";
-    }
-
     bind() {
         this.addEventListener("keyup", (e) => {
             switch (e.key) {
