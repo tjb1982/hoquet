@@ -1,4 +1,4 @@
-import * as _hoquet from "./hoquet.js";
+import {render} from "./hoquet.js";
 import {importCSS} from "./utils.js";
 
 
@@ -50,7 +50,6 @@ export default ((C = null, {shadowy = true} = {}) => {
             });
         }
 
-        get hoquet() { return _hoquet; }
         get template() {}
         get styles() {}
 
@@ -86,9 +85,17 @@ export default ((C = null, {shadowy = true} = {}) => {
         }
 
         fragment(...sources) {
-            return document.createRange().createContextualFragment(
-                this.hoquet.render(...sources)
-            );
+            const container = document.createDocumentFragment();
+            sources.map(source => {
+                if (source instanceof HTMLTemplateElement)
+                    return document.importNode(source.content, true);
+                else if (source instanceof DocumentFragment || source instanceof HTMLElement)
+                    return document.importNode(source, true);
+                return document.createRange().createContextualFragment(
+                    render(source)
+                );
+            }).forEach(frag => container.appendChild(frag));
+            return container;
         }
 
         replace(container, ...sources) {

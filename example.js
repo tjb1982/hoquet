@@ -3,6 +3,15 @@ import Hoquet from "./mixin.js";
 const states = ["todo", "doing", "done"];
 
 
+const template = document.createElement("template");
+template.innerHTML = `
+<div>
+    <input id="new-todo" type="text">
+    <ul id="list"></ul>
+</div>
+`;
+
+
 class TodoList extends Hoquet(HTMLElement) {
 
     static get reflectedAttributes() { return ["placeholder"]; }
@@ -15,10 +24,15 @@ class TodoList extends Hoquet(HTMLElement) {
 
     constructor() {
         super();
-        this.placeholder = this.placeholder || "Default placeholder...";
         this.render();
         this.select("list", "new-todo");
+        this.placeholder = this.placeholder || "Default placeholder...";
         this.bind();
+    }
+
+    connectedCallback() {
+        // XXX: This works but it's not ideal
+        //this.placeholder = this.placeholder || "Default placeholder...";
     }
 
     bind() {
@@ -44,12 +58,7 @@ class TodoList extends Hoquet(HTMLElement) {
     }
 
     get template() {
-        return (
-            ["div"
-            , ["input", {id: "new-todo", type: "text", placeholder: this.placeholder}]
-            , ["ul", {id: "list"}, null]
-            ]
-        );
+        return template;
     }
 
     get styles() {
