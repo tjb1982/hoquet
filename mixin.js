@@ -37,14 +37,15 @@ export default ((C = null, {shadowy = true} = {}) => {
                             : val;
                     },
                     set: (value) => {
-                        if (value === true)
+                        if (value === true || value === "")
                             this.setAttribute(k, "");
                         else if (!value)
                             this.removeAttribute(k);
                         else
                             this.setAttribute(k, value);
                     },
-                    enumerable: true
+                    enumerable: true,
+                    configurable: true
                 });
             });
         }

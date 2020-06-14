@@ -26,10 +26,8 @@ function json_btoa(x) {
 }
 
 function renderAttributeValue(val) {
-    return Array.isArray(val)
-        ? val.join(" ")
-        : canConcatenate(val)
-        ? val
+    return Array.isArray(val) ? val.join(" ")
+        : canConcatenate(val) ? val
         : json_btoa(JSON.stringify(val));
 }
 
@@ -37,7 +35,7 @@ function renderAttribute([k, v]) {
     return v === true
     ? k
     : v ? [k, "=", "\"", renderAttributeValue(v), "\""].join("")
-    : null;
+    : "";
 }
 
 function renderAttributes(form) {
