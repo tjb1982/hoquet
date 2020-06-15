@@ -50,6 +50,12 @@ export default ((C = null, {shadowy = true} = {}) => {
             });
         }
 
+        reflect() {
+            this.constructor.reflectedAttributes.forEach(
+                k => this[k] = this[k]
+            );
+        }
+
         get template() {}
         get styles() {}
 
@@ -67,12 +73,9 @@ export default ((C = null, {shadowy = true} = {}) => {
             configs.forEach(config => {
                 const configIsNotArray = !Array.isArray(config);
                 let [propName, selector, method] = config;
-                let obj = this;
+                let obj = this.$;
 
                 if (configIsNotArray || config.length === 1) {
-                    if (this.$ === void(0))
-                        Object.defineProperty(this, "$", {value: {}});
-                    obj = this.$;
                     selector = propName = configIsNotArray ? config : propName;
                     method = void(0);
                 }
@@ -82,6 +85,8 @@ export default ((C = null, {shadowy = true} = {}) => {
                     writable: true
                 });
             });
+
+            return this.$;
         }
 
         fragment(...sources) {
@@ -106,6 +111,9 @@ export default ((C = null, {shadowy = true} = {}) => {
         }
 
         render(strategy = renderStrategy.REPLACE) {
+            if (this.$ === void(0))
+                Object.defineProperty(this, "$", {value: {}});
+
             switch (strategy) {
             case renderStrategy.APPEND:
                 this[_container].appendChild(this.fragment(["style", this.styles], this.template));
@@ -121,6 +129,12 @@ export default ((C = null, {shadowy = true} = {}) => {
                 this.replace(this[_container], ["style", this.styles], this.template);
                 break;
             }
+
+            Array.from(this[_container].querySelectorAll("[id]")).forEach($el => {
+                this.$[$el.id] = $el;
+            });
+
+            this.reflect();
         }
     }
 

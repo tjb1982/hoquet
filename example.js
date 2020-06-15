@@ -3,8 +3,8 @@ import Hoquet from "./mixin.js";
 const states = ["todo", "doing", "done"];
 
 
-const template = document.createElement("template");
-template.innerHTML = `
+const listTemplate = document.createElement("template");
+listTemplate.innerHTML = `
 <div>
     <input id="new-todo" type="text">
     <ul id="list"></ul>
@@ -15,19 +15,20 @@ template.innerHTML = `
 class TodoList extends Hoquet(HTMLElement) {
 
     static get reflectedAttributes() { return ["placeholder"]; }
-    static get observedAttributes() { return ["placeholder"]; }
-    attributeChangedCallback(key, prev, curr) {
-        if (key === "placeholder") {
+    static get observedAttributes() { return this.reflectedAttributes; }
+    attributeChangedCallback(k, prev, curr) {
+        if (!this.$)
+            return;
+
+        if (k === "placeholder") {
             this.$["new-todo"].placeholder = curr;
         }
     }
 
-    constructor() {
-        super();
+    connectedCallback() {
         this.render();
-        this.select("list", "new-todo");
-        this.placeholder = this.placeholder || "Default placeholder...";
         this.bind();
+        this.placeholder = this.placeholder || "Default placeholder...";
     }
 
     bind() {
@@ -53,7 +54,7 @@ class TodoList extends Hoquet(HTMLElement) {
     }
 
     get template() {
-        return template;
+        return listTemplate;
     }
 
     get styles() {
@@ -70,16 +71,13 @@ class TodoItem extends Hoquet(HTMLElement) {
     constructor({name, state}) {
         super();
         this.name = name;
+        this.state = state;
+    }
+
+    connectedCallback() {
         this.render();
 
-        this.select(
-                "x",
-                ["$li", "li", "querySelector"]
-        );
-
-        this.state = state;
-
-        this.$li.addEventListener("click", e => this.toggleState());
+        this.$["li"].addEventListener("click", e => this.toggleState());
         this.$["x"].addEventListener("click", e => {
             e.stopPropagation();
             this.dispatchEvent(new CustomEvent("item-deleted", {
@@ -88,12 +86,15 @@ class TodoItem extends Hoquet(HTMLElement) {
         });
     }
 
-    static get reflectedAttributes() { return ["state"]; }
-    static get observedAttributes() { return ["state"]; }
+    static get reflectedAttributes() { return ["state", "name"]; }
+    static get observedAttributes() { return this.reflectedAttributes; }
     attributeChangedCallback(k, prev, curr) {
+        if (!this.$)
+            return;
+
         if (k === "state") {
-            states.forEach(x => this.$li.classList.remove(x));
-            this.$li.classList.add(curr);
+            states.forEach(x => this.$.li.classList.remove(x));
+            this.$.li.classList.add(curr);
         }
     }
 
@@ -107,10 +108,9 @@ class TodoItem extends Hoquet(HTMLElement) {
 
     get template() {
         return (
-            ["li"
-            , ["span", {class: "name"}, this.name]
-            , ["span", {id: "x"}, "x"]
-            ]
+            ["li", {id: "li"},
+             ["span", {class: "name"}, this.name],
+             ["span", {id: "x"}, "x"]]
         );
     }
 
