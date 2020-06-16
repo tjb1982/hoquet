@@ -1,5 +1,5 @@
 import {render} from "./hoquet.js";
-import {importCSS} from "./utils.js";
+import {_importStyleRules} from "./utils.js";
 
 
 const renderStrategy = Object.create(null, {
@@ -56,8 +56,8 @@ export default ((C = null, {shadowy = true} = {}) => {
             );
         }
 
-        get template() {}
-        get styles() {}
+        get template() { return ""; }
+        get styles() { return ""; }
 
         set [_container](value) { Object.defineProperty(this, __container, {value}); }
         get [_container]() { return this[__container]; }
@@ -111,30 +111,40 @@ export default ((C = null, {shadowy = true} = {}) => {
         }
 
         render(strategy = renderStrategy.REPLACE) {
+            const container = this[_container];
+            const _styles = this.styles;
+            const styles = typeof _styles === "string"
+                ? ["style", _styles]
+                : _styles;
+
             if (this.$ === void(0))
                 Object.defineProperty(this, "$", {value: {}});
 
             switch (strategy) {
             case renderStrategy.APPEND:
-                this[_container].appendChild(this.fragment(["style", this.styles], this.template));
+                container.appendChild(this.fragment(styles, this.template));
                 break;
             case renderStrategy.PREPEND:
-                this[_container].insertBefore(
-                    this.fragment(["style", this.styles], this.template),
-                    this[_container].firstChild
+                container.insertBefore(
+                    this.fragment(styles, this.template),
+                    container.firstChild
                 );
                 break;
             case renderStrategy.REPLACE:
             default:
-                this.replace(this[_container], ["style", this.styles], this.template);
+                this.replace(container, styles, this.template);
                 break;
             }
 
-            Array.from(this[_container].querySelectorAll("[id]")).forEach($el => {
+            Array.from(container.querySelectorAll("[id]")).forEach($el => {
                 this.$[$el.id] = $el;
             });
 
             this.reflect();
+        }
+
+        adoptStyleSheets(...sources) {
+            _importStyleRules(this[_container], sources, shadowy);
         }
     }
 
