@@ -39,8 +39,8 @@ const importCSS = (doc, sources) => {
         const tests = sources[id];
 
         const style = doc.querySelector(`style[name="${id}"], link[name="${id}"]`);
-        const sheet = style?.sheet;
-        const rules = sheet?.cssRules;
+        const sheet = style && style.sheet;
+        const rules = sheet && sheet.cssRules;
 
         if (!rules)
             return target;
