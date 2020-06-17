@@ -5,22 +5,83 @@ const absolutePath = (src) => {
     return !src ? null : _anchor.href;
 }
 
-const _importStyleRules = (container, sources, shadowy) => {
-    let target, targetIsShadowRoot = false;
-    if (shadowy && Object.hasOwnProperty(container, "adoptedStyleSheets")) {
-        targetIsShadowRoot = true;
-        target = container;
-    } else {
-        target = container.firstElementChild.sheet;
+const hasAdoptedStyleSheetsProperty = !!Object.getOwnPropertyDescriptor(
+    ShadowRoot.prototype, "adoptedStyleSheets"
+);
+
+class StyleDummy extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({mode: "open"});
+        const $s = document.createElement("style");
+        this.shadowRoot.appendChild($s);
     }
 
-    if (targetIsShadowRoot) {
-        target.adoptedStyleSheets = sources;
-        return;
+    get styleElement() {
+        return this.shadowRoot.firstChild;
     }
-    sources.forEach(source => {
-        Array.from(source.rules).forEach(rule => target.insertRule(rule.cssText));
-    });
+}
+window.customElements.define(`abc-def-ghi-jkl-mno-pqr-stu-vwx-yz`, StyleDummy);
+
+const styleSheetFromString = (styles) => {
+    let styleSheet;
+    try {
+        styleSheet = new CSSStyleSheet;
+        styleSheet.replaceSync(styles);
+    } catch (e) {
+        const dummy = new StyleDummy;
+        document.body.appendChild(dummy);
+        const $style = dummy.styleElement;
+        $style.innerHTML = styles;
+        styleSheet = $style.sheet;
+        document.body.removeChild(dummy);
+    }
+    return styleSheet;
+};
+
+const stylesheet = (strs, ...argv) => {
+    let a = [];
+    for (let i = 0; i < strs.length; i++) {
+        a.push(strs[i]);
+        a.push(`${argv.shift() || ""}`);
+    }
+    
+    return styleSheetFromString(a.join(""));
+}
+
+const _importStyleRules = (
+    container,
+    sources,
+    shadowy
+) => {
+    // NOTE: empty array ([]) is truthy (i.e., adoptedStyleSheets is not `hasOwnProperty`
+    // but should be an empty array if it exists.
+    if (shadowy && hasAdoptedStyleSheetsProperty) {
+        container.adoptedStyleSheets = [...container.adoptedStyleSheets, ...sources];
+    } else {
+        let target;
+        target = container.firstElementChild;
+        if (!target.sheet) {
+            const firstElement = target;
+            target = document.createElement("style");
+            container.insertBefore(target, firstElement);
+        }
+        // NOTE: this is just like is done with, e.g., webpack, when you import a CSS file
+        // as a string and prepend it to each newly constructed component. It's not ideal,
+        // but the only other workaround would be what's commented out below, but you'd
+        // have to call `this.adoptStyleSheets` with every `connectedCallback` because
+        // the styles are lost every time the node is disconnected.
+        const cssText = sources.map(
+            source => Array.from(source.rules).map(rule => rule.cssText).join("")
+        ).join("");
+
+        target.innerHTML += cssText;
+    }
+
+    // `target` used to be container.firstElementChild.sheet
+    //sources.forEach(source => {
+    //    Array.from(source.rules).forEach(rule => target.insertRule(rule.cssText));
+    //});
 };
 
 const importCSS = (doc, sources) => {
@@ -29,10 +90,10 @@ const importCSS = (doc, sources) => {
     try {
         target = new CSSStyleSheet;
     } catch (e) {
-        const $style = document.createElement("style");
-        document.body.appendChild($style);
-        target = $style.sheet;
-        document.body.removeChild($style);
+        const $dummy = new StyleDummy;
+        document.body.appendChild($dummy);
+        target = $dummy.styleElement.sheet;
+        document.body.removeChild($dummy);
     }
 
     for (const id in sources) {
@@ -64,4 +125,4 @@ const importCSS = (doc, sources) => {
     return target;
 }
 
-export { importCSS, _importStyleRules };
+export { importCSS, _importStyleRules, stylesheet };
