@@ -116,6 +116,7 @@ module.exports = Object.create(null, {
     renderElement: {value: renderElement},
     renderAttributes: {value: renderAttributes},
     renderAttribute: {value: renderAttribute},
-    renderAttributeValue: {value: renderAttributeValue}
+    renderAttributeValue: {value: renderAttributeValue},
+    isNumber: {value: isNumber}
 });
 

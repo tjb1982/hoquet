@@ -1,4 +1,4 @@
-import {render} from "./hoquet.js";
+import {render, isNumber} from "./hoquet.js";
 import {_importStyleRules} from "./utils.js";
 
 
@@ -38,7 +38,7 @@ export default ((C = null, {shadowy = true} = {}) => {
                     set: (value) => {
                         if (value === true || value === "")
                             this.setAttribute(k, "");
-                        else if (!value)
+                        else if (!value && !isNumber(value))
                             this.removeAttribute(k);
                         else
                             this.setAttribute(k, value);

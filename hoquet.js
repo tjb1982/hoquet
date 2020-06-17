@@ -111,5 +111,5 @@ function _render (a) {
 
 }
 
-export { render, renderElement, renderAttributes, renderAttribute, renderAttributeValue };
+export { render, renderElement, renderAttributes, renderAttribute, renderAttributeValue, isNumber };
 
