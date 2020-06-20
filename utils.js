@@ -42,12 +42,25 @@ const styleSheetFromString = (styles) => {
 const stylesheet = (strs, ...argv) => {
     let a = [];
     for (let i = 0; i < strs.length; i++) {
-        a.push(strs[i]);
+        a.push(strs[i].replace(/\s\s+/g, " "));
         a.push(`${argv.shift() || ""}`);
     }
-    
+
     return styleSheetFromString(a.join(""));
 }
+
+const html = (parts, ...argv) => {
+    const template = document.createElement("template");
+    template.innerHTML = parts.map(
+        x => x.replace(/\s\s+/g, " ")
+    ).reduce((p, c) => {
+        return p.trim() + argv.shift() + c.trim();
+    });
+    return template;
+};
+
+const template = html;
+
 
 const _importStyleRules = (
     container,
@@ -125,4 +138,10 @@ const importCSS = (doc, sources) => {
     return target;
 }
 
-export { importCSS, _importStyleRules, stylesheet };
+export {
+    importCSS,
+    _importStyleRules,
+    stylesheet,
+    html,
+    template
+};
