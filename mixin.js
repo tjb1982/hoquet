@@ -26,16 +26,21 @@ export default ((C = null, {shadowy = true} = {}) => {
             } else {
                 this[_container] = this;
             }
+        }
 
-            this.constructor.reflectedAttributes.forEach(k => {
-                Object.defineProperty(this, k, {
-                    get: () => {
+        static defineReflectedAttributes() {
+            if (!this.reflectedAttributes)
+                return;
+
+            Array.from(this.reflectedAttributes).forEach(k => {
+                Object.defineProperty(this.prototype, k, {
+                    get: function() {
                         const val = this.getAttribute(k);
                         return val === "" ? true
                             : val === null ? false
                             : val;
                     },
-                    set: (value) => {
+                    set: function(value) {
                         if (value === true || value === "")
                             this.setAttribute(k, "");
                         else if (!value && !isNumber(value))
@@ -48,6 +53,14 @@ export default ((C = null, {shadowy = true} = {}) => {
                 });
             });
         }
+
+        static get observedAttributes() {
+            this.defineReflectedAttributes();
+            return this.reflectedAttributes || void(0);
+        }
+
+        // Required to exist, otherwise `observedAttributes` won't be called
+        attributeChangedCallback(k, p, c) {}
 
         reflect() {
             this.constructor.reflectedAttributes.forEach(
