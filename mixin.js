@@ -1,22 +1,20 @@
 import {render, isNumber} from "./hoquet.js";
-import {_importStyleRules} from "./utils.js";
+import {_importStyleRules, normalizeStylesEntry} from "./utils.js";
 
-
-const renderStrategy = Object.create(null, {
-    REPLACE: {value: 1},
-    APPEND: {value: 2},
-    PREPEND: {value: 3}
-});
 
 const _container = "f1c1d5a2-a012-4cdf-ade9-365935290f88";
 const __container = "e9312871-6a6a-4227-9cda-00cbd67d397f";
 
-export default ((C = null, {shadowy = true} = {}) => {
+export default ((C = null, {
+    shadowy = true,
+    template = "",
+    stylesheets = [],
+    attributes = []
+} = {}) => {
 
     class A extends (C) {
 
-        static get renderStrategy() { return renderStrategy; }
-        static get reflectedAttributes() { return []; }
+        static get reflectedAttributes() { return attributes; }
 
         constructor(...args) {
             super(...args);
@@ -29,7 +27,7 @@ export default ((C = null, {shadowy = true} = {}) => {
         }
 
         static defineReflectedAttributes() {
-            if (!this.reflectedAttributes)
+            if (!this.reflectedAttributes && !attributes.length)
                 return;
 
             Array.from(this.reflectedAttributes).forEach(k => {
@@ -68,8 +66,8 @@ export default ((C = null, {shadowy = true} = {}) => {
             );
         }
 
-        get template() { return ""; }
-        get styles() { return ""; }
+        get template() { return template; }
+        get styles() { return ""; } //stylesheets; }
 
         set [_container](value) { Object.defineProperty(this, __container, {value}); }
         get [_container]() { return this[__container]; }
@@ -122,31 +120,24 @@ export default ((C = null, {shadowy = true} = {}) => {
             container.appendChild(this.fragment(...sources));
         }
 
-        render(strategy = renderStrategy.REPLACE) {
+        render() {
             const container = this[_container];
-            const _styles = this.styles;
-            const styles = typeof _styles === "string"
-                ? ["style", _styles]
-                : _styles;
+            const {sheets, styles} = normalizeStylesEntry(this.styles).reduce((conf, source) => {
+                conf[
+                    source instanceof CSSStyleSheet
+                        ? "sheets"
+                        : "styles"
+                ].push(source);
+
+                return conf;
+            }, {sheets: [], styles: []});
+
+            this.adoptStyleSheets(...sheets, ...stylesheets);
 
             if (this.$ === void(0))
                 Object.defineProperty(this, "$", {value: {}});
 
-            switch (strategy) {
-            case renderStrategy.APPEND:
-                container.appendChild(this.fragment(styles, this.template));
-                break;
-            case renderStrategy.PREPEND:
-                container.insertBefore(
-                    this.fragment(styles, this.template),
-                    container.firstChild
-                );
-                break;
-            case renderStrategy.REPLACE:
-            default:
-                this.replace(container, styles, this.template);
-                break;
-            }
+            this.replace(container, ...styles, this.template);
 
             Array.from(container.querySelectorAll("[id]")).forEach($el => {
                 this.$[$el.id] = $el;

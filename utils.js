@@ -97,6 +97,7 @@ const _importStyleRules = (
     //});
 };
 
+
 const importCSS = (doc, sources) => {
     //const styleSheets = doc.styleSheets;
     let target, k, l;
@@ -138,10 +139,25 @@ const importCSS = (doc, sources) => {
     return target;
 }
 
+/**
+ * 
+ * @param {*} styles either a single string of CSS, a single item `this.fragment` can handle
+ *      (e.g., ["style", "..."], or stylesheet`...`, or HTMLTemplateElement/DocumentFragment, etc.),
+ *      or an array of things `this.fragment` can handle.
+ */
+const normalizeStylesEntry = (styles) => {
+    return typeof styles === "string"
+    ? [["style", styles]]
+    : Array.isArray(styles)
+    ? styles
+    : [styles];
+}
+
 export {
     importCSS,
     _importStyleRules,
     stylesheet,
     html,
-    template
+    template,
+    normalizeStylesEntry,
 };
