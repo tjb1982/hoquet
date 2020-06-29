@@ -132,12 +132,16 @@ export default ((C = null, {
                 return conf;
             }, {sheets: [], styles: []});
 
-            this.adoptStyleSheets(...sheets, ...stylesheets);
+            if (!this.adoptStyleSheets(...stylesheets, ...sheets)) {
+                [...stylesheets, ...sheets].forEach(sheet => {
+                    styles.push(["style", Array.from(sheet.rules).map(rule => rule.cssText).join(" ")]);
+                });
+            }
+
+            this.replace(container, ...styles, this.template);
 
             if (this.$ === void(0))
                 Object.defineProperty(this, "$", {value: {}});
-
-            this.replace(container, ...styles, this.template);
 
             Array.from(container.querySelectorAll("[id]")).forEach($el => {
                 this.$[$el.id] = $el;
@@ -147,7 +151,7 @@ export default ((C = null, {
         }
 
         adoptStyleSheets(...sources) {
-            _importStyleRules(this[_container], sources, shadowy);
+            return _importStyleRules(this[_container], sources, shadowy);
         }
     }
 
