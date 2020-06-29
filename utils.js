@@ -71,25 +71,27 @@ const _importStyleRules = (
     // but should be an empty array if it exists.
     if (shadowy && hasAdoptedStyleSheetsProperty) {
         container.adoptedStyleSheets = [...container.adoptedStyleSheets, ...sources];
-    } else {
-        let target;
-        target = container.firstElementChild;
-        if (!target.sheet) {
-            const firstElement = target;
-            target = document.createElement("style");
-            container.insertBefore(target, firstElement);
-        }
-        // NOTE: this is just like is done with, e.g., webpack, when you import a CSS file
-        // as a string and prepend it to each newly constructed component. It's not ideal,
-        // but the only other workaround would be what's commented out below, but you'd
-        // have to call `this.adoptStyleSheets` with every `connectedCallback` because
-        // the styles are lost every time the node is disconnected.
-        const cssText = sources.map(
-            source => Array.from(source.rules).map(rule => rule.cssText).join("")
-        ).join("");
-
-        target.innerHTML += cssText;
+        return true;
     }
+    // else {
+    //     let target;
+    //     target = container.firstElementChild;
+    //     if (!target?.sheet) {
+    //         const firstElement = target;
+    //         target = document.createElement("style");
+    //         container.insertBefore(target, firstElement);
+    //     }
+    //     // NOTE: this is just like is done with, e.g., webpack, when you import a CSS file
+    //     // as a string and prepend it to each newly constructed component. It's not ideal,
+    //     // but the only other workaround would be what's commented out below, but you'd
+    //     // have to call `this.adoptStyleSheets` with every `connectedCallback` because
+    //     // the styles are lost every time the node is disconnected.
+    //     const cssText = sources.map(
+    //         source => Array.from(source.rules).map(rule => rule.cssText).join("")
+    //     ).join("");
+
+    //     target.innerHTML += cssText;
+    // }
 
     // `target` used to be container.firstElementChild.sheet
     //sources.forEach(source => {
