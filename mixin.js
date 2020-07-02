@@ -120,7 +120,8 @@ export default ((C = null, {
             container.appendChild(this.fragment(...sources));
         }
 
-        render() {
+        render(options = {}) {
+            const {reflect = true} = options;
             const container = this[_container];
             const {sheets, styles} = normalizeStylesEntry(this.styles).reduce((conf, source) => {
                 conf[
@@ -147,7 +148,7 @@ export default ((C = null, {
                 this.$[$el.id] = $el;
             });
 
-            this.reflect();
+            reflect && this.reflect();
         }
 
         adoptStyleSheets(...sources) {
