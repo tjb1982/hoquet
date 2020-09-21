@@ -1,4 +1,4 @@
-import {render, isNumber} from "./hoquet.js";
+import {render} from "./hoquet.js";
 import {_importStyleRules, normalizeStylesEntry} from "./utils.js";
 
 
@@ -50,7 +50,7 @@ export default ((C = HTMLElement, {
                     set: function(value) {
                         if (value === true || value === "")
                             this.setAttribute(k, "");
-                        else if (!value && !isNumber(value))
+                        else if (!value && value !== 0)
                             this.removeAttribute(k);
                         else
                             this.setAttribute(k, value);
@@ -74,7 +74,7 @@ export default ((C = HTMLElement, {
 
         reflect() {
             this.constructor.reflectedAttributes.forEach(
-                k => this.attributeChangedCallback(k, this[k], this[k])
+                k => this[k] = this[k]
             );
         }
 
