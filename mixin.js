@@ -5,7 +5,7 @@ import {_importStyleRules, normalizeStylesEntry} from "./utils.js";
 const _container_key = "f1c1d5a2-a012-4cdf-ade9-365935290f88";
 const _container_ptr = "e9312871-6a6a-4227-9cda-00cbd67d397f";
 
-export default ((C = null, {
+export default ((C = HTMLElement, {
     template = "",
     stylesheets = [],
     attributes = [],
@@ -14,9 +14,16 @@ export default ((C = null, {
     mapIDs = true
 } = {}) => {
 
+    if (!(HTMLElement === C || HTMLElement.isPrototypeOf(C))) {
+        throw new Error(
+            "Hoquet mixin must wrap either HTMLElement or a subclass of " +
+            "HTMLElement."
+        );
+    }
+
     class A extends (C) {
 
-        static get reflectedAttributes() { return attributes; }
+        static get reflectedAttributes() { return attributes || []; }
 
         constructor(...args) {
             super(...args);
@@ -29,7 +36,7 @@ export default ((C = null, {
         }
 
         static defineReflectedAttributes() {
-            if (!this.reflectedAttributes && !attributes.length)
+            if (!this.reflectedAttributes.length)
                 return;
 
             Array.from(this.reflectedAttributes).forEach(k => {
