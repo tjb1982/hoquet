@@ -155,6 +155,10 @@ const normalizeStylesEntry = (styles) => {
     : [styles];
 }
 
+const rendered = (h) => {
+    return h.hasOwnProperty("$");
+}
+
 export {
     importCSS,
     _importStyleRules,
@@ -162,4 +166,5 @@ export {
     html,
     template,
     normalizeStylesEntry,
+    rendered,
 };

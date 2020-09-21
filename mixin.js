@@ -2,14 +2,16 @@ import {render, isNumber} from "./hoquet.js";
 import {_importStyleRules, normalizeStylesEntry} from "./utils.js";
 
 
-const _container = "f1c1d5a2-a012-4cdf-ade9-365935290f88";
-const __container = "e9312871-6a6a-4227-9cda-00cbd67d397f";
+const _container_key = "f1c1d5a2-a012-4cdf-ade9-365935290f88";
+const _container_ptr = "e9312871-6a6a-4227-9cda-00cbd67d397f";
 
 export default ((C = null, {
-    shadowy = true,
     template = "",
     stylesheets = [],
-    attributes = []
+    attributes = [],
+    shadowy = true,
+    renderOnce = true,
+    mapIDs = true
 } = {}) => {
 
     class A extends (C) {
@@ -20,9 +22,9 @@ export default ((C = null, {
             super(...args);
             if (shadowy) {
                 this.attachShadow({mode:"open"});
-                this[_container] = this.shadowRoot;
+                this[_container_key] = this.shadowRoot;
             } else {
-                this[_container] = this;
+                this[_container_key] = this;
             }
         }
 
@@ -57,23 +59,26 @@ export default ((C = null, {
             return this.reflectedAttributes || void(0);
         }
 
-        // Required to exist, otherwise `observedAttributes` won't be called
-        attributeChangedCallback(k, p, c) {}
+        /**
+         * Required to exist, otherwise `observedAttributes` won't be called.
+         * However, client code can override as normal.
+        */
+        attributeChangedCallback(..._) {}
 
         reflect() {
             this.constructor.reflectedAttributes.forEach(
-                k => this[k] = this[k]
+                k => this.attributeChangedCallback(k, this[k], this[k])
             );
         }
 
         get template() { return template; }
         get styles() { return ""; } //stylesheets; }
 
-        set [_container](value) { Object.defineProperty(this, __container, {value}); }
-        get [_container]() { return this[__container]; }
+        set [_container_key](value) { Object.defineProperty(this, _container_ptr, {value}); }
+        get [_container_key]() { return this[_container_ptr]; }
 
         getElementById(id) {
-            const container = this[_container];
+            const container = this[_container_key];
             return container === this.shadowRoot
                 ? container.getElementById(id)
                 : container.querySelector(`#${id}`);
@@ -91,7 +96,7 @@ export default ((C = null, {
                 }
 
                 Object.defineProperty(obj, propName, {
-                    value: this[_container][method || "getElementById"](selector),
+                    value: this[_container_key][method || "getElementById"](selector),
                     writable: true
                 });
             });
@@ -121,38 +126,47 @@ export default ((C = null, {
         }
 
         render(options = {}) {
-            const {reflect = true} = options;
-            const container = this[_container];
-            const {sheets, styles} = normalizeStylesEntry(this.styles).reduce((conf, source) => {
-                conf[
-                    source instanceof CSSStyleSheet
-                        ? "sheets"
-                        : "styles"
-                ].push(source);
+            const {
+                reflect = true
+            } = options;
+            const container = this[_container_key];
 
-                return conf;
-            }, {sheets: [], styles: []});
+            if (!this.$ || !renderOnce) {
+                const {sheets, styles} = normalizeStylesEntry(this.styles).reduce((conf, source) => {
+                    conf[
+                        source instanceof CSSStyleSheet
+                            ? "sheets"
+                            : "styles"
+                    ].push(source);
 
-            if (!this.adoptStyleSheets(...stylesheets, ...sheets)) {
-                [...stylesheets, ...sheets].forEach(sheet => {
-                    styles.push(["style", Array.from(sheet.rules).map(rule => rule.cssText).join(" ")]);
+                    return conf;
+                }, {sheets: [], styles: []});
+
+                if (!this.adoptStyleSheets(...stylesheets, ...sheets)) {
+                    [...stylesheets, ...sheets].forEach(sheet => {
+                        styles.push(["style", Array.from(sheet.rules).map(rule => rule.cssText).join(" ")]);
+                    });
+                }
+
+                this.replace(container, ...styles, this.template);
+
+                if (this.$ === void(0))
+                    Object.defineProperty(this, "$", {value: {}});
+            }
+
+            if (mapIDs) {
+                Array.from(container.querySelectorAll("[id]")).forEach($el => {
+                    this.$[$el.id] = $el;
                 });
             }
 
-            this.replace(container, ...styles, this.template);
-
-            if (this.$ === void(0))
-                Object.defineProperty(this, "$", {value: {}});
-
-            Array.from(container.querySelectorAll("[id]")).forEach($el => {
-                this.$[$el.id] = $el;
-            });
-
-            reflect && this.reflect();
+            if (reflect) {
+                this.reflect();
+            }
         }
 
         adoptStyleSheets(...sources) {
-            return _importStyleRules(this[_container], sources, shadowy);
+            return _importStyleRules(this[_container_key], sources, shadowy);
         }
     }
 
