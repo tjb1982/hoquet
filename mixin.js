@@ -86,7 +86,7 @@ export default ((C = HTMLElement, {
          * }
          * ```
          * 
-         * And this doesn't do anything useful:
+         * And this is functionally equivalent to `inst.render({reflect: false})`:
          * 
          * ```
          * static get observedAttributes() {
