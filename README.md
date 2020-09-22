@@ -1,6 +1,7 @@
 # Hoquet
-A tiny, minimal, platform-native, vanilla JavaScript web component framework.
+A tiny, minimal, platform-native, vanilla JavaScript web component library.
 
+The goal of this project is not necessarily to suggest using this particular library (although I use it in my own projects). Instead, the goal is as much to demostrate patterns you can use in your own projects using Web Components without having to use any framework/library.
 
 ## `HTMLElement` mixin
 The `Hoquet` mixin is the core of the library. It is designed to wrap any `class` that `extends` `HTMLElement`. It provides a small number of interfaces for dealing with template rendering, stylesheet construction, Shadow DOM, and attribute observation/reflection. Nothing that is provided is required. The template and stylesheets for each component are constructed only once, when the class is declared.
