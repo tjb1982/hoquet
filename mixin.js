@@ -91,7 +91,7 @@ export default ((C = HTMLElement, {
          * ```
          * static get observedAttributes() {
          *     return [
-         *          ...this.reflectedAttributes, // i.e., []
+         *          ...this.reflectedAttributes, // i.e., returns `attributes` without creating `reflectedAttributes`
          *          "ignoring", "all", "reflected", "attributes"
          *     ];
          * }
