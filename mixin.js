@@ -1,5 +1,5 @@
 import {render} from "./hoquet.js";
-import {_importStyleRules, normalizeStylesEntry} from "./utils.js";
+import {_importStyleRules, normalizeStylesEntry, rendered} from "./utils.js";
 
 
 const _container_key = "f1c1d5a2-a012-4cdf-ade9-365935290f88";
@@ -9,12 +9,19 @@ export default ((C = HTMLElement, {
     template = "",
     stylesheets = [],
     attributes = [],
+    /**
+     * If true, shadow DOM is initialized by the constructor.
+     */
     shadowy = true,
-    renderOnce = true,
-    mapIDs = true
+    /**
+     * If true, subsequent calls to render will not create new DOM elements,
+     * only update references and reflect attributes.
+     */
+    renderOnce = true
 } = {}) => {
 
-    if (!(HTMLElement === C || HTMLElement.isPrototypeOf(C))) {
+    const isHTMLElement = HTMLElement === C || HTMLElement.isPrototypeOf(C);
+    if (!isHTMLElement) {
         throw new Error(
             "Hoquet mixin must wrap either HTMLElement or a subclass of " +
             "HTMLElement."
@@ -23,10 +30,9 @@ export default ((C = HTMLElement, {
 
     class A extends (C) {
 
-        static get reflectedAttributes() { return attributes || []; }
-
         constructor(...args) {
             super(...args);
+
             if (shadowy) {
                 this.attachShadow({mode:"open"});
                 this[_container_key] = this.shadowRoot;
@@ -34,6 +40,8 @@ export default ((C = HTMLElement, {
                 this[_container_key] = this;
             }
         }
+
+        static get reflectedAttributes() { return attributes || []; }
 
         static defineReflectedAttributes() {
             if (!this.reflectedAttributes.length)
@@ -61,16 +69,45 @@ export default ((C = HTMLElement, {
             });
         }
 
+        /**
+         * By default, all `reflectedAttributes` are `observedAttributes`, but
+         * it's also possible to override this so that additional attributes
+         * can be defined that aren't reflected (e.g., if they wouldn't trigger
+         * immediate mutations to the DOM). Just be careful not to forget to
+         * include the `reflectedAttributes` in the override. E.g., this
+         * probably does what you want:
+         * 
+         * ```
+         * static get observedAttributes() {
+         *     return [
+         *         ...super.observedAttributes, // i.e., creates `reflectedAttributes`, returns their names
+         *         "further", "unreflected", "attributes"
+         *     ];
+         * }
+         * ```
+         * 
+         * And this doesn't do anything useful:
+         * 
+         * ```
+         * static get observedAttributes() {
+         *     return [
+         *          ...this.reflectedAttributes, // i.e., []
+         *          "ignoring", "all", "reflected", "attributes"
+         *     ];
+         * }
+         * ```
+         */
         static get observedAttributes() {
             this.defineReflectedAttributes();
             return this.reflectedAttributes || void(0);
         }
 
         /**
-         * Required to exist, otherwise `observedAttributes` won't be called.
-         * However, client code can override as normal.
+         * This method is required to exist, otherwise `observedAttributes`
+         * won't be called by the browser. However, client code can override
+         * (or not) as normal.
         */
-        attributeChangedCallback(..._) {}
+        attributeChangedCallback() {}
 
         reflect() {
             this.constructor.reflectedAttributes.forEach(
@@ -79,7 +116,7 @@ export default ((C = HTMLElement, {
         }
 
         get template() { return template; }
-        get styles() { return ""; } //stylesheets; }
+        get styles() { return ""; }
 
         set [_container_key](value) { Object.defineProperty(this, _container_ptr, {value}); }
         get [_container_key]() { return this[_container_ptr]; }
@@ -134,30 +171,46 @@ export default ((C = HTMLElement, {
 
         render(options = {}) {
             const {
-                reflect = true
+                /**
+                 * If true, after the template/styles have been rendered, all
+                 * `reflectedAttributes` will be reapplied, triggering
+                 * `attributeChangedCallback`, so that DOM changes can be made.
+                 */
+                reflect = true,
+                /**
+                 * If true, any element with an `id` attribute will be culled
+                 * into the `this.$` property for easy access.
+                 */
+                mapIDs = true
             } = options;
             const container = this[_container_key];
+            const canRenderMultipleTimes = !renderOnce;
 
-            if (!this.$ || !renderOnce) {
-                const {sheets, styles} = normalizeStylesEntry(this.styles).reduce((conf, source) => {
-                    conf[
-                        source instanceof CSSStyleSheet
-                            ? "sheets"
-                            : "styles"
-                    ].push(source);
+            if (!rendered(this) || canRenderMultipleTimes) {
+                const {sheets, styles} = normalizeStylesEntry(this.styles).reduce(
+                    (conf, source) => {
+                        conf[
+                            source instanceof CSSStyleSheet
+                                ? "sheets"
+                                : "styles"
+                        ].push(source);
 
-                    return conf;
-                }, {sheets: [], styles: []});
+                        return conf;
+                    },
+                    {sheets: [], styles: []}
+                );
 
                 if (!this.adoptStyleSheets(...stylesheets, ...sheets)) {
                     [...stylesheets, ...sheets].forEach(sheet => {
-                        styles.push(["style", Array.from(sheet.rules).map(rule => rule.cssText).join(" ")]);
+                        styles.push(["style", Array.from(sheet.rules).map(
+                            rule => rule.cssText
+                        ).join(" ")]);
                     });
                 }
 
                 this.replace(container, ...styles, this.template);
 
-                if (this.$ === void(0))
+                if (!this.hasOwnProperty("$"))
                     Object.defineProperty(this, "$", {value: {}});
             }
 
