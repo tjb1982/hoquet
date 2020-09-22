@@ -19,8 +19,8 @@
   ],
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^7.1.2",
-    "serve": "^11.3.0"
+    "mocha": "^7.2.0",
+    "serve": "^11.3.2"
   },
   "scripts": {
     "test": "mocha --reporter spec",
