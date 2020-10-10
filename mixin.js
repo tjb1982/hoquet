@@ -1,5 +1,5 @@
-import {render} from "./hoquet.js";
-import {_importStyleRules, normalizeStylesEntry, rendered} from "./utils.js";
+import { render } from "./hoquet.js";
+import { _importStyleRules, normalizeStylesEntry, rendered } from "./utils.js";
 
 
 const _container_key = "f1c1d5a2-a012-4cdf-ade9-365935290f88";
@@ -28,26 +28,33 @@ export default ((C = HTMLElement, {
         );
     }
 
+    const _reflectedAttributes = new Set([...(C.reflectedAttributes || []), ...attributes] || []);
+    const _observedAttributes = [...(C.observedAttributes || [])];
+
     class A extends (C) {
 
         constructor(...args) {
             super(...args);
 
             if (shadowy) {
-                this.attachShadow({mode:"open"});
+                if (!this.shadowRoot) {
+                    this.attachShadow({mode:"open"});
+                }
                 this[_container_key] = this.shadowRoot;
             } else {
                 this[_container_key] = this;
             }
         }
 
-        static get reflectedAttributes() { return attributes || []; }
+        static get reflectedAttributes() {
+            return _reflectedAttributes;
+        }
 
         static defineReflectedAttributes() {
-            if (!this.reflectedAttributes.length)
+            if (!this.reflectedAttributes.size)
                 return;
 
-            Array.from(this.reflectedAttributes).forEach(k => {
+            for (let k of this.reflectedAttributes) {
                 Object.defineProperty(this.prototype, k, {
                     get: function() {
                         const val = this.getAttribute(k);
@@ -66,7 +73,7 @@ export default ((C = HTMLElement, {
                     enumerable: true,
                     configurable: true
                 });
-            });
+            }
         }
 
         /**
@@ -99,22 +106,30 @@ export default ((C = HTMLElement, {
          */
         static get observedAttributes() {
             this.defineReflectedAttributes();
-            return this.reflectedAttributes || void(0);
+            return [..._observedAttributes, ...this.reflectedAttributes];
         }
 
         /**
          * This method is required to exist, otherwise `observedAttributes`
          * won't be called by the browser. However, client code can override
          * (or not) as normal.
-        */
-        attributeChangedCallback() {}
-
-        reflect() {
-            this.constructor.reflectedAttributes.forEach(
-                k => this[k] = this[k]
-            );
+         * 
+         * Also, we don't try to determine whether `attributeChangedCallback`
+         * is a function or not for performance reasons.
+         */
+        attributeChangedCallback(k, p, c) {
+            if (super.attributeChangedCallback) {
+                super.attributeChangedCallback(k, p, c);
+            }
         }
 
+        reflect() {
+            for (let k of _reflectedAttributes) {
+                this[k] = this[k]
+            }
+        }
+
+        static get template() { return template; }
         get template() { return template; }
         get styles() { return ""; }
 
@@ -210,14 +225,15 @@ export default ((C = HTMLElement, {
 
                 this.replace(container, ...styles, this.template);
 
-                if (!this.hasOwnProperty("$"))
-                    Object.defineProperty(this, "$", {value: {}});
-            }
-
-            if (mapIDs) {
-                Array.from(container.querySelectorAll("[id]")).forEach($el => {
-                    this.$[$el.id] = $el;
-                });
+                if (!this.hasOwnProperty("$")) {
+                    Object.defineProperty(this, "$", {
+                        value: mapIDs
+                            ? new Proxy({}, {
+                                get: (target, k) => container.getElementById(k)
+                            })
+                            : true
+                    });
+                }
             }
 
             if (reflect) {
