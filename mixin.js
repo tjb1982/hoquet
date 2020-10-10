@@ -1,7 +1,7 @@
 import { render } from "./hoquet.js";
 import { _importStyleRules, normalizeStylesEntry, rendered } from "./utils.js";
 
-
+const _nullobj = Object.create(null);
 const _container_key = "f1c1d5a2-a012-4cdf-ade9-365935290f88";
 const _container_ptr = "e9312871-6a6a-4227-9cda-00cbd67d397f";
 
@@ -228,7 +228,7 @@ export default ((C = HTMLElement, {
                 if (!this.hasOwnProperty("$")) {
                     Object.defineProperty(this, "$", {
                         value: mapIDs
-                            ? new Proxy({}, {
+                            ? new Proxy(_nullobj, {
                                 get: (target, k) => container.getElementById(k)
                             })
                             : true
