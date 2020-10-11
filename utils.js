@@ -159,6 +159,28 @@ const rendered = (h) => {
     return h.hasOwnProperty("$");
 }
 
+const defineReflectedAttributes = (C) => {
+    for (let k of C.reflectedAttributes) {
+        Object.defineProperty(C.prototype, k, {
+            get: function() {
+                const val = this.getAttribute(k);
+                return val === "" ? true
+                    : val === null ? false
+                    : val;
+            },
+            set: function(value) {
+                if (value === true || value === "")
+                    this.setAttribute(k, "");
+                else if (!value && value !== 0)
+                    this.removeAttribute(k);
+                else
+                    this.setAttribute(k, value);
+            },
+            enumerable: true,
+            configurable: true
+        });
+    }
+}
 
 export {
     importCSS,
@@ -167,5 +189,6 @@ export {
     html,
     template,
     normalizeStylesEntry,
-    rendered
+    rendered,
+    defineReflectedAttributes
 };

@@ -47,7 +47,7 @@ class TodoList extends Hoquet(HTMLElement, {
         });
 
         this.addEventListener("item-deleted", (e) => {
-            this.removeItem(e.detail.item);
+            this.removeItem(e.detail);
         });
     }
 

@@ -1,5 +1,6 @@
 import { render } from "./hoquet.js";
-import { _importStyleRules, normalizeStylesEntry, rendered } from "./utils.js";
+import { _importStyleRules, normalizeStylesEntry, rendered, defineReflectedAttributes } from "./utils.js";
+
 
 const _nullobj = Object.create(null);
 const _container_key = "f1c1d5a2-a012-4cdf-ade9-365935290f88";
@@ -17,7 +18,16 @@ export default ((C = HTMLElement, {
      * If true, subsequent calls to render will not create new DOM elements,
      * only update references and reflect attributes.
      */
-    renderOnce = true
+    renderOnce = true,
+    /**
+     * Optionally provide your own implemetation for how to access elements by
+     * ID in this component. (I.e., `getElementById` is a `Document` API, and
+     * hence, not implemented for `HTMLElement`, but *is* implemented for
+     * `shadowRoot`).
+     * 
+     * Expects a function like `(id) => document.getElementById(id)`
+     */
+    getElementById = void 0
 } = {}) => {
 
     const isHTMLElement = HTMLElement === C || HTMLElement.isPrototypeOf(C);
@@ -30,6 +40,9 @@ export default ((C = HTMLElement, {
 
     const _reflectedAttributes = new Set([...(C.reflectedAttributes || []), ...attributes] || []);
     const _observedAttributes = [...(C.observedAttributes || [])];
+    const _getElementById = getElementById || shadowy
+        ? function(id) { return this.shadowRoot.getElementById(id); }
+        : function(id) { return this.querySelector(`#${id}`); };
 
     class A extends (C) {
 
@@ -48,32 +61,6 @@ export default ((C = HTMLElement, {
 
         static get reflectedAttributes() {
             return _reflectedAttributes;
-        }
-
-        static defineReflectedAttributes() {
-            if (!this.reflectedAttributes.size)
-                return;
-
-            for (let k of this.reflectedAttributes) {
-                Object.defineProperty(this.prototype, k, {
-                    get: function() {
-                        const val = this.getAttribute(k);
-                        return val === "" ? true
-                            : val === null ? false
-                            : val;
-                    },
-                    set: function(value) {
-                        if (value === true || value === "")
-                            this.setAttribute(k, "");
-                        else if (!value && value !== 0)
-                            this.removeAttribute(k);
-                        else
-                            this.setAttribute(k, value);
-                    },
-                    enumerable: true,
-                    configurable: true
-                });
-            }
         }
 
         /**
@@ -105,7 +92,7 @@ export default ((C = HTMLElement, {
          * ```
          */
         static get observedAttributes() {
-            this.defineReflectedAttributes();
+            defineReflectedAttributes(this);
             return [..._observedAttributes, ...this.reflectedAttributes];
         }
 
@@ -129,39 +116,11 @@ export default ((C = HTMLElement, {
             }
         }
 
-        static get template() { return template; }
         get template() { return template; }
         get styles() { return ""; }
 
         set [_container_key](value) { Object.defineProperty(this, _container_ptr, {value}); }
         get [_container_key]() { return this[_container_ptr]; }
-
-        getElementById(id) {
-            const container = this[_container_key];
-            return container === this.shadowRoot
-                ? container.getElementById(id)
-                : container.querySelector(`#${id}`);
-        }
-
-        select(...configs) {
-            configs.forEach(config => {
-                const configIsNotArray = !Array.isArray(config);
-                let [propName, selector, method] = config;
-                let obj = this.$;
-
-                if (configIsNotArray || config.length === 1) {
-                    selector = propName = configIsNotArray ? config : propName;
-                    method = void(0);
-                }
-
-                Object.defineProperty(obj, propName, {
-                    value: this[_container_key][method || "getElementById"](selector),
-                    writable: true
-                });
-            });
-
-            return this.$;
-        }
 
         fragment(...sources) {
             const container = document.createDocumentFragment();
@@ -193,10 +152,11 @@ export default ((C = HTMLElement, {
                  */
                 reflect = true,
                 /**
-                 * If true, any element with an `id` attribute will be culled
-                 * into the `this.$` property for easy access.
+                 * If true, any element with an `id` attribute will be cached
+                 * in the `this.$` property for easy access. Otherwise, a Proxy
+                 * is created for `this.$` doing `container.getElementById`.
                  */
-                mapIDs = true
+                cacheIDs = false //!shadowy
             } = options;
             const container = this[_container_key];
             const canRenderMultipleTimes = !renderOnce;
@@ -227,13 +187,19 @@ export default ((C = HTMLElement, {
 
                 if (!this.hasOwnProperty("$")) {
                     Object.defineProperty(this, "$", {
-                        value: mapIDs
-                            ? new Proxy(_nullobj, {
-                                get: (target, k) => container.getElementById(k)
+                        value: cacheIDs
+                            ? {}
+                            : new Proxy(_nullobj, {
+                                get: (_, k) => _getElementById.call(this, k)
                             })
-                            : true
                     });
                 }
+            }
+
+            if (cacheIDs) {
+                Array.from(container.querySelectorAll("[id]")).forEach(
+                    el => this.$[el.id] = el
+                );
             }
 
             if (reflect) {

@@ -62,7 +62,7 @@ export default class TodoItem extends Hoquet(HTMLElement, {
         this.$["x"].addEventListener("click", e => {
             e.stopPropagation();
             this.dispatchEvent(new CustomEvent("item-deleted", {
-                composed: true, bubbles: true, detail: {item: this}
+                composed: true, bubbles: true, detail: this
             }));
         });
     }
