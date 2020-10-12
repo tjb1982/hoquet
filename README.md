@@ -6,7 +6,7 @@ The goal of this project is not necessarily to suggest using this particular lib
 ## `HTMLElement` mixin
 The `Hoquet` mixin is the core of the library. It is designed to wrap any `class` that `extends` `HTMLElement`. It provides a small number of interfaces for dealing with template rendering, stylesheet construction, Shadow DOM, and attribute observation/reflection. Nothing that is provided is required. The template and stylesheets for each component are constructed only once, when the class is declared.
 
-The following is a traditional todo app implementation using platform-native web components and the `Hoquet` mixin. It consists of a `TodoItem` component that can have three states (todo, doing, and done), and a `TodoList` component that can hold any number of `TodoItem`s. See `./example` for the source files. To run this demo with npm, run `npm run demo` in a terminal at the top level of this repository.
+The following is a traditional todo app implementation using platform-native web components and the `Hoquet` mixin. It consists of a `TodoItem` component that subclasses `HTMLLIElement`, and can have three states (todo, doing, and done), and a `TodoApp` component that can hold any number of `TodoItem`s. See `./example` for the entire source. To run this demo with npm, run `npm run demo` in a terminal at the top level of this repository.
 
 ```javascript
 // todo-item.js
