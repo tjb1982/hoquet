@@ -1,27 +1,40 @@
-const _anchor = document.createElement("a");
-
-const absolutePath = (src) => {
-    _anchor.href = src;
-    return !src ? null : _anchor.href;
-}
+const uuid = "f1c1d5a2-a012-4cdf-ade9-365935290f88";
 
 const hasAdoptedStyleSheetsProperty = !!Object.getOwnPropertyDescriptor(
     ShadowRoot.prototype, "adoptedStyleSheets"
 );
+if (!hasAdoptedStyleSheetsProperty) {
+    console.warn(
+        "Cannot `adoptStyleSheets`: will fall back to " +
+        "appending `cssRules` to template style tag (for each component " +
+        "instance)."
+    );
+}
+try {
+    new CSSStyleSheet;
+} catch (e) {
+    console.warn(
+        "Cannot use `CSSStyleSheet` constructor: will fall back to " +
+        "constructing `CSSStyleSheet` by creating/appending/removing style " +
+        "tag."
+    );
+}
 
 class StyleDummy extends HTMLElement {
-    constructor() {
+    constructor(styles) {
         super();
         this.attachShadow({mode: "open"});
-        const $s = document.createElement("style");
-        this.shadowRoot.appendChild($s);
-    }
-
-    get styleElement() {
-        return this.shadowRoot.firstChild;
+        const $ = document.createElement("style");
+        $.innerHTML = styles || "";
+        this.shadowRoot.appendChild($);
+        // this.$ = $;
+        document.body.appendChild(this);
+        const stylesheet = $.sheet;
+        document.body.removeChild(this);
+        return stylesheet;
     }
 }
-window.customElements.define(`abc-def-ghi-jkl-mno-pqr-stu-vwx-yz`, StyleDummy);
+window.customElements.define(uuid, StyleDummy);
 
 const styleSheetFromString = (styles) => {
     let styleSheet;
@@ -29,12 +42,7 @@ const styleSheetFromString = (styles) => {
         styleSheet = new CSSStyleSheet;
         styleSheet.replaceSync(styles);
     } catch (e) {
-        const dummy = new StyleDummy;
-        document.body.appendChild(dummy);
-        const $style = dummy.styleElement;
-        $style.innerHTML = styles;
-        styleSheet = $style.sheet;
-        document.body.removeChild(dummy);
+        styleSheet = new StyleDummy(styles);
     }
     return styleSheet;
 };
@@ -101,15 +109,11 @@ const _importStyleRules = (
 
 
 const importCSS = (doc, sources) => {
-    //const styleSheets = doc.styleSheets;
     let target, k, l;
     try {
         target = new CSSStyleSheet;
     } catch (e) {
-        const $dummy = new StyleDummy;
-        document.body.appendChild($dummy);
-        target = $dummy.styleElement.sheet;
-        document.body.removeChild($dummy);
+        target = new StyleDummy();
     }
 
     for (const id in sources) {
@@ -148,7 +152,9 @@ const importCSS = (doc, sources) => {
  *      or an array of things `this.fragment` can handle.
  */
 const normalizeStylesEntry = (styles) => {
-    return typeof styles === "string"
+    return !styles
+    ? []
+    : typeof styles === "string"
     ? [["style", styles]]
     : Array.isArray(styles)
     ? styles
@@ -190,5 +196,6 @@ export {
     template,
     normalizeStylesEntry,
     rendered,
-    defineReflectedAttributes
+    defineReflectedAttributes,
+    uuid
 };

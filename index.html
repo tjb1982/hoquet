@@ -3,31 +3,9 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>body { margin: 0; }</style>
-        <script type="module" src="/example/todo-list.js"></script>
+        <script type="module" src="/example/todo-app.js"></script>
     </head>
     <body>
-        Using "placeholder" attribute:
-        <todo-list placeholder="What do you want to do?"></todo-list>
-
-        <br/>
-
-        Using default placeholder:
-        <todo-list id="reflected"></todo-list>
-
-        <script>
-            document.addEventListener("DOMContentLoaded", _ => {
-                const $tl = document.getElementById("reflected");
-                const choices = [
-                    $tl.placeholder,
-                    "Next thing to do...",
-                    "What should we do...",
-                    "Type some text here...",
-                    "Enter an item in the shopping list..."
-                ];
-                setInterval(_ => {
-                    $tl.placeholder = choices[Math.floor(Math.random() * choices.length)];
-                }, 5000);
-            });
-        </script>
+        <todo-app placeholder="What do you want to do?"></todo-app>
     </body>
 </html>

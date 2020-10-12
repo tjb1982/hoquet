@@ -8,27 +8,109 @@ The `Hoquet` mixin is the core of the library. It is designed to wrap any `class
 
 The following is a traditional todo app implementation using platform-native web components and the `Hoquet` mixin. It consists of a `TodoItem` component that can have three states (todo, doing, and done), and a `TodoList` component that can hold any number of `TodoItem`s. See `./example` for the source files. To run this demo with npm, run `npm run demo` in a terminal at the top level of this repository.
 
+```javascript
+// todo-item.js
+import Hoquet from "../mixin.js";
+import { template } from "../utils.js";
+
+
+const states = ["todo", "doing", "done"];
+
+export default class TodoItem extends Hoquet(HTMLLIElement, {
+    attributes: ["state", "name"],
+    template: template`
+        <span class="name"></span>
+        <span class="delete">x</span>
+    `,
+    /**
+     * HTMLLIElement doesn't support `attachShadow`
+     */
+    shadowy: false
+}) {
+    
+    constructor(name) {
+        super();
+        this.name = name;
+        this.state = states[0];
+    }
+
+    static states = states;
+
+    connectedCallback() {
+        this.render();
+
+        this.addEventListener("click", e => {
+            if (e.target.classList.contains("delete")) {
+                this.dispatch("item-deleted");
+            } else {
+                this.toggleState()
+            }
+        });
+    }
+
+    dispatch(name) {
+        this.dispatchEvent(new CustomEvent(name, {
+            composed: true, bubbles: true, detail: this
+        }));
+    }
+
+    attributeChangedCallback(key, prev, curr) {
+        if (!this.rendered)
+            return;
+
+        if (key === "state") {
+            states.forEach(state => this.classList.remove(state));
+            this.classList.add(curr);
+            this.dispatch("item-state-changed");
+        } else if (key === "name") {
+            const $name = this.querySelector(".name");
+            $name.innerText = curr;
+        }
+    }
+
+    toggleState() {
+        const currentStateIndex = states.indexOf(this.state);
+        this.state = states[
+            currentStateIndex >= states.length - 1
+                ? 0 : currentStateIndex + 1
+        ];
+    }
+}
+
+window.customElements.define("todo-item", TodoItem, {extends: "li"});
+```
 
 ```javascript
-// todo-list.js
+// todo-app.js
 import Hoquet from "../mixin.js";
-import { stylesheet, template, rendered } from "../utils.js";
+import { stylesheet, template } from "../utils.js";
 
 import TodoItem from "./todo-item.js";
 
 
-class TodoList extends Hoquet(HTMLElement, {
+const capitalize = (x) => `${x[0].toUpperCase()}${x.substr(1)}`;
+
+const styles = "...";
+
+class TodoApp extends Hoquet(HTMLElement, {
     template: template`
-        <div>
-            <input id="new-todo-input" type="text">
-            <ul id="list"></ul>
-        </div>
+        <header>
+            <div id="report">
+            ${
+                TodoItem.states.map(
+                    state => (
+                        `${capitalize(state)}: <span id="${state}-count">0</span>`
+                    )
+                ).join(", ")
+            }
+            </div>
+            <button id="clear-done">Clear done</button>
+        </header>
+        <input id="new-todo-input" type="text">
+        <ul id="list"></ul>
     `,
     stylesheets: [
-        stylesheet`
-            #list { margin: 0; padding: 0; }
-            #new-todo-input { font-size: 2rem; margin: 0; padding: 0; width: 100%; }
-        `
+        stylesheet`${styles}`
     ],
     attributes: ["placeholder"]
 }) {
@@ -40,7 +122,7 @@ class TodoList extends Hoquet(HTMLElement, {
     }
 
     attributeChangedCallback(key, prev, curr) {
-        if (!rendered(this))
+        if (!this.rendered)
             return;
             
         if (key === "placeholder") {
@@ -49,7 +131,7 @@ class TodoList extends Hoquet(HTMLElement, {
     }
 
     bind() {
-        this.addEventListener("keyup", (e) => {
+        this.addEventListener("keyup", e => {
             if (e.key === "Enter") {
                 const name = this.$["new-todo-input"].value.trim();
                 if (name) {
@@ -59,117 +141,49 @@ class TodoList extends Hoquet(HTMLElement, {
             }
         });
 
-        this.addEventListener("item-deleted", (e) => {
-            this.removeItem(e.detail.item);
+        this.addEventListener("item-state-changed", e => {
+            this.updateReport();
+        });
+
+        this.addEventListener("item-deleted", e => {
+            this.removeItem(e.detail);
+            this.updateReport();
+        });
+
+        this.$["clear-done"].addEventListener("click", e => {
+            this.clear("done");
         });
     }
 
-    removeItem(item) {
+    updateReport() {
+        TodoItem.states.forEach(state => {
+            this.$[`${state}-count`].innerText =
+                [...this.$["list"].children].reduce(
+                    (count, $item) => count + ($item.state === state), 0
+                );
+        });
+    }
+
+    removeItem(item, update = false) {
         this.$["list"].removeChild(item);
     }
 
     addItem(item) {
         this.$["list"].appendChild(new TodoItem(item));
     }
-}
 
-window.customElements.define("todo-list", TodoList);
-```
-
-```javascript
-// todo-item.js
-import Hoquet from "../mixin.js";
-import { rendered, stylesheet, template } from "../utils.js";
-
-
-const styles = stylesheet`
-...
-`;
-
-const states = ["todo", "doing", "done"];
-
-export default class TodoItem extends Hoquet(HTMLElement, {
-    stylesheets: [styles],
-    attributes: ["state", "name"],
-    template: template`
-        <li id="item">
-            <span id="name"></span>
-            <span id="x">x</span>
-        </li>
-    `
-}) {
-    
-    constructor(name) {
-        super();
-        this.name = name;
-        this.state = states[0];
-    }
-
-    connectedCallback() {
-        this.render();
-
-        this.$["item"].addEventListener("click", e => this.toggleState());
-        
-        this.$["x"].addEventListener("click", e => {
-            e.stopPropagation();
-            this.dispatchEvent(new CustomEvent("item-deleted", {
-                composed: true, bubbles: true, detail: {item: this}
-            }));
+    clear(state) {
+        [...this.$["list"].children].forEach($item => {
+            if ($item.state === state) {
+                this.removeItem($item);
+            }
         });
+        this.updateReport();
     }
-
-    attributeChangedCallback(key, prev, curr) {
-        if (!rendered(this))
-            return;
-
-        if (key === "state") {
-            states.forEach(state => this.$.item.classList.remove(state));
-            this.$.item.classList.add(curr);
-        } else if (key === "name") {
-            this.$.name.innerText = curr;
-        }
-    }
-
-    toggleState() {
-        const currentStateIndex = states.indexOf(this.state);
-        this.state = states[
-            currentStateIndex >= states.length - 1
-                ? 0 : currentStateIndex + 1
-        ];
-    }
-
-    /**
-     * If you would prefer to render a component with its state interpolated
-     * into the template at "runtime" (as we're doing below with `this.name`),
-     * you can provide a `template` getter in lieu of a declared template,
-     * which can be either a structured list of S-expressions like the below
-     * form, an `HTMLTemplateElement`, or a normal template string, such as:
-     * 
-     * `<li id="item">
-     *     <span class="name">${this.name}</span>
-     *     <span id="x">x</span>
-     * </li>`
-     * 
-     * This is unnecessary in most cases, though, because the state could
-     * be handled by the delivered `attributeChangedCallback` mechanism,
-     * which provides better flexibility and performance, and then you only
-     * render once, which means that the browser doesn't have to construct any
-     * elements more than once, and you can describe imperatively how to
-     * surgically change their state within `attributeChangedCallback`.
-     */
-    // get template() {
-    //     return (
-    //         ["li", {id: "item"},
-    //          ["span", {id: "name"}, this.name],
-    //          ["span", {id: "x"}, "x"]]
-    //     );
-    // }
-
 }
 
-window.customElements.define("todo-item", TodoItem);
+window.customElements.define("todo-app", TodoApp);
 ```
-
 
 ```html
 <!doctype html>

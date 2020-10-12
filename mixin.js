@@ -1,10 +1,10 @@
 import { render } from "./hoquet.js";
-import { _importStyleRules, normalizeStylesEntry, rendered, defineReflectedAttributes } from "./utils.js";
+import { _importStyleRules, normalizeStylesEntry, rendered, defineReflectedAttributes, uuid } from "./utils.js";
 
 
 const _nullobj = Object.create(null);
-const _container_key = "f1c1d5a2-a012-4cdf-ade9-365935290f88";
-const _container_ptr = "e9312871-6a6a-4227-9cda-00cbd67d397f";
+const CONTAINER_KEY = uuid;
+const CONTAINER_PTR = `${uuid}-ptr`;
 
 export default ((C = HTMLElement, {
     template = "",
@@ -15,19 +15,16 @@ export default ((C = HTMLElement, {
      */
     shadowy = true,
     /**
-     * If true, subsequent calls to render will not create new DOM elements,
+     * If false, subsequent calls to render will not create new DOM elements,
      * only update references and reflect attributes.
      */
-    renderOnce = true,
+    rerenderable = false,
     /**
-     * Optionally provide your own implemetation for how to access elements by
-     * ID in this component. (I.e., `getElementById` is a `Document` API, and
-     * hence, not implemented for `HTMLElement`, but *is* implemented for
-     * `shadowRoot`).
-     * 
-     * Expects a function like `(id) => document.getElementById(id)`
+     * If true, any element with an `id` attribute will be cached
+     * in the `this.$` property for easy access. Otherwise, a Proxy
+     * is created for `this.$` doing `container.getElementById`.
      */
-    getElementById = void 0
+    cacheIDs = false //!shadowy
 } = {}) => {
 
     const isHTMLElement = HTMLElement === C || HTMLElement.isPrototypeOf(C);
@@ -40,7 +37,7 @@ export default ((C = HTMLElement, {
 
     const _reflectedAttributes = new Set([...(C.reflectedAttributes || []), ...attributes] || []);
     const _observedAttributes = [...(C.observedAttributes || [])];
-    const _getElementById = getElementById || shadowy
+    const _getElementById = shadowy
         ? function(id) { return this.shadowRoot.getElementById(id); }
         : function(id) { return this.querySelector(`#${id}`); };
 
@@ -53,9 +50,9 @@ export default ((C = HTMLElement, {
                 if (!this.shadowRoot) {
                     this.attachShadow({mode:"open"});
                 }
-                this[_container_key] = this.shadowRoot;
+                this[CONTAINER_KEY] = this.shadowRoot;
             } else {
-                this[_container_key] = this;
+                this[CONTAINER_KEY] = this;
             }
         }
 
@@ -119,21 +116,19 @@ export default ((C = HTMLElement, {
         get template() { return template; }
         get styles() { return ""; }
 
-        set [_container_key](value) { Object.defineProperty(this, _container_ptr, {value}); }
-        get [_container_key]() { return this[_container_ptr]; }
+        set [CONTAINER_KEY](value) { Object.defineProperty(this, CONTAINER_PTR, {value}); }
+        get [CONTAINER_KEY]() { return this[CONTAINER_PTR]; }
 
         fragment(...sources) {
-            const container = document.createDocumentFragment();
-            sources.map(source => {
-                if (source instanceof HTMLTemplateElement)
-                    return document.importNode(source.content, true);
-                else if (source instanceof DocumentFragment || source instanceof HTMLElement)
-                    return document.importNode(source, true);
-                return document.createRange().createContextualFragment(
-                    render(source)
-                );
-            }).forEach(frag => container.appendChild(frag));
-            return container;
+            return sources.map(source => source instanceof HTMLTemplateElement
+                ? document.importNode(source.content, true)
+                : source instanceof DocumentFragment || source instanceof HTMLElement
+                ? document.importNode(source, true)
+                : document.createRange().createContextualFragment(render(source))
+            ).reduce((parent, child) => {
+                parent.appendChild(child);
+                return parent;
+            }, document.createDocumentFragment());
         }
 
         replace(container, ...sources) {
@@ -143,6 +138,8 @@ export default ((C = HTMLElement, {
             container.appendChild(this.fragment(...sources));
         }
 
+        get rendered() { return this.hasOwnProperty("$"); }
+
         render(options = {}) {
             const {
                 /**
@@ -150,18 +147,12 @@ export default ((C = HTMLElement, {
                  * `reflectedAttributes` will be reapplied, triggering
                  * `attributeChangedCallback`, so that DOM changes can be made.
                  */
-                reflect = true,
-                /**
-                 * If true, any element with an `id` attribute will be cached
-                 * in the `this.$` property for easy access. Otherwise, a Proxy
-                 * is created for `this.$` doing `container.getElementById`.
-                 */
-                cacheIDs = false //!shadowy
+                reflect = true
             } = options;
-            const container = this[_container_key];
-            const canRenderMultipleTimes = !renderOnce;
+            const container = this[CONTAINER_KEY];
+            const rendered = this.rendered;
 
-            if (!rendered(this) || canRenderMultipleTimes) {
+            if (!rendered || rerenderable) {
                 const {sheets, styles} = normalizeStylesEntry(this.styles).reduce(
                     (conf, source) => {
                         conf[
@@ -185,7 +176,7 @@ export default ((C = HTMLElement, {
 
                 this.replace(container, ...styles, this.template);
 
-                if (!this.hasOwnProperty("$")) {
+                if (!rendered) {
                     Object.defineProperty(this, "$", {
                         value: cacheIDs
                             ? {}
@@ -208,7 +199,7 @@ export default ((C = HTMLElement, {
         }
 
         adoptStyleSheets(...sources) {
-            return _importStyleRules(this[_container_key], sources, shadowy);
+            return !sources.length || _importStyleRules(this[CONTAINER_KEY], sources, shadowy);
         }
     }
 
