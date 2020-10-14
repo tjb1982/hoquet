@@ -3,8 +3,8 @@ import { _importStyleRules, normalizeStylesEntry, rendered, defineReflectedAttri
 
 
 const _nullobj = Object.create(null);
-const CONTAINER_KEY = uuid;
-const CONTAINER_PTR = `${uuid}-ptr`;
+const CONTAINER_KEY = Symbol();
+const CONTAINER_PTR = Symbol();
 
 export default ((C = HTMLElement, {
     template = "",

@@ -190,7 +190,7 @@ window.customElements.define("todo-app", TodoApp);
 <html>
 <head><script type="module" src="/example/todo-list.js"></script></head>
 <body>
-    <todo-list placeholder="what do you want to do today?"></todo-list>
+        <todo-app placeholder="What do you want to do?"></todo-app>
 </body>
 </html>
 ```
