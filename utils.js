@@ -62,7 +62,7 @@ const html = (parts, ...argv) => {
     template.innerHTML = parts.map(
         x => x.replace(/\s\s+/g, " ")
     ).reduce((p, c) => {
-        return p.trim() + argv.shift() + c.trim();
+        return p + argv.shift() + c;
     });
     return template;
 };

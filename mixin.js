@@ -13,7 +13,7 @@ export default ((C = HTMLElement, {
     /**
      * If true, shadow DOM is initialized by the constructor.
      */
-    shadowy = true,
+    shadowy = false,
     /**
      * If false, subsequent calls to render will not create new DOM elements,
      * only update references and reflect attributes.
@@ -52,7 +52,9 @@ export default ((C = HTMLElement, {
                 }
                 this[CONTAINER_KEY] = this.shadowRoot;
             } else {
-                this[CONTAINER_KEY] = this;
+                const $div = document.createElement("div");
+                this.appendChild($div);
+                this[CONTAINER_KEY] = $div;
             }
         }
 

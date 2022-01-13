@@ -11,15 +11,15 @@ export type RenderOptions = {
     reflect: boolean
 };
 
-private class Hoquet<T extends new (...args) => HTMLElement> extends HTMLElement {
+declare abstract class AHoquet extends HTMLElement {
     getElementById (id: string): HTMLElement | null;
     render (options?: RenderOptions): void;
     get rendered (): boolean;
     static get reflectedAttributes (): string[];
     $: { [key: string]: HTMLElement };
-    fragment (...src: any[]): DocumentFragment;
-};
+    fragment (...src): DocumentFragment;
+}
 
 export default function<T extends new (...args) => HTMLElement>
-    (c: T, options?: ConstructorOptions): new (...args: any[]) => Hoquet<T>;
+    (c: T, options?: ConstructorOptions): new (...args) => AHoquet;
 
