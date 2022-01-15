@@ -11,7 +11,7 @@ export type RenderOptions = {
     reflect: boolean
 };
 
-declare abstract class AHoquet extends HTMLElement {
+declare abstract class AHoquet {
     getElementById (id: string): HTMLElement | null;
     render (options?: RenderOptions): void;
     get rendered (): boolean;
@@ -20,6 +20,6 @@ declare abstract class AHoquet extends HTMLElement {
     fragment (...src): DocumentFragment;
 }
 
-export default function<T extends new (...args) => HTMLElement>
-    (c: T, options?: ConstructorOptions): new (...args) => AHoquet;
+type makeFn = <T1 extends typeof HTMLElement>(el: T1, opts?: ConstructorOptions) => InstanceType<T1> & AHoquet;
 
+export default makeFn;
