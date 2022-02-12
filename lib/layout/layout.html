@@ -1,0 +1,31 @@
+<header id="header-wrapper" class="padded">
+    <div id="main-header">
+        <h1 class="main-title">
+            <slot name="main-title"></slot>
+        </h1>
+        <div class="spacer"></div>
+        <div id="context-menu">
+            <slot name="context-menu"></slot>
+        </div>
+    </div>
+</header>
+
+<div class="modal" id="modal"></div>
+<div class="modal" id="loading-modal">
+    <!-- SVG spinner -->
+</div>
+
+<div class="drawer" id="left-drawer">
+    <slot name="left-drawer"></slot>
+</div>
+<div class="drawer" id="right-drawer">
+    <slot name="right-drawer"></slot>
+</div>
+
+<main id="main-content" class="padded">
+    <slot name="main"></slot>
+</main>
+
+<div id="footer" class="padded">
+    <slot name="footer"></slot>
+</div>

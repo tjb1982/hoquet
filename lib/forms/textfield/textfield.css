@@ -1,0 +1,38 @@
+.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+    background-color: var(--mdc-text-field-fill-color);
+}
+
+.mdc-text-field:not(.mdc-text-field--disabled) .mdc-text-field__input {
+    color: var(--mdc-text-field-ink-color);
+}
+
+.mdc-text-field:not(.mdc-text-field--disabled, .mdc-text-field--invalid) .mdc-floating-label {
+    color: var(--mdc-text-field-label-ink-color);
+}
+/* .mdc-text-field--invalid:not(.mdc-text-field--disabled) .mdc-floating-label {
+    color: var(--mdc-theme-error);
+} */
+.mdc-text-field:not(.mdc-text-field--disabled, .mdc-text-field--invalid).mdc-text-field--focused .mdc-floating-label.mdc-floating-label--float-above {
+    color: var(--mdc-theme-primary);
+}
+
+.mdc-text-field:not(.mdc-text-field--disabled) .mdc-text-field__affix--prefix {
+    color: var(--mdc-text-field-label-ink-color);
+}
+.mdc-text-field:not(.mdc-text-field--disabled) .mdc-text-field__affix--suffix {
+    color: var(--mdc-text-field-label-ink-color);
+}
+.mdc-text-field {
+    width: 100%;
+}
+
+.mdc-text-field:not(.mdc-text-field--disabled)+.mdc-text-field-helper-line .mdc-text-field-helper-text {
+    color: var(--mdc-text-field-ink-color);
+}
+
+.mdc-text-field--disabled.mdc-text-field--filled {
+    background-color: var(--mdc-text-field-disabled-fill-color);
+}
+.mdc-text-field--disabled .mdc-floating-label {
+    color: var(--mdc-text-field-disabled-ink-color);
+}

@@ -1,0 +1,264 @@
+:host {
+    display: flex;
+    flex-direction: row;
+    align-content: baseline;
+    height: 100%;
+    /* width: 100vw; */
+    /* max-width: 100%; */
+    color: var(--theme-ink-color);
+    flex-wrap: wrap;
+    --hq-layout-header-height: 2.5rem;
+    /* box-shadow: 0 0 20px #aaa; */
+    margin: auto;
+    min-height: 100vh;
+    /* why 55px? */
+    min-height: calc(100vh - 55px);
+    --hq-layout-padding: 30px;
+    padding: 0;
+    
+    width: 100%;
+    /* overflow: hidden; */
+
+    --max-screen: 1366px;
+}
+
+.padded {
+    transition: padding 200ms ease-in-out;
+    padding: var(--hq-layout-padding);
+}
+#header-wrapper {
+    width: 100%;
+    position: relative;
+    top: 0;
+    background: rgba(0,0,0,0.0);
+    transition:
+        background 200ms ease-in-out,
+        box-shadow 200ms ease-in-out,
+        padding 200ms ease-in-out;
+}
+#header-wrapper.hidden {
+    /* box-shadow: 0 0 5px #aaa; */
+    z-index: 1;
+    position: sticky;
+    transform: translateY(-125px);
+}
+#header-wrapper.hidden-transition {
+    transition: all 150ms ease-in-out;
+}
+#header-wrapper.sticky {
+    box-shadow: 0 0 5px #aaa;
+    z-index: 1;
+    position: sticky;
+    background: rgba(0,0,0,.9);
+    transform: translateY(0px);
+    transition: transform 150ms ease-in-out;
+}
+#footer {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    transition: all 150ms ease-in-out;
+}
+#footer.hidden {
+    box-shadow: 0 0 5px #aaa;
+    transform: translateY(75px);
+}
+#footer.hidden-transition {
+    transition: all 150ms ease-in-out;
+}
+#footer.sticky {
+    box-shadow: 0 0 5px #aaa;
+    transform: translateY(0px);
+    transition: transform 150ms ease-in-out;
+}
+#main-header {
+    /* background: #ccc;
+    background: #fff; */
+    display: flex;
+    z-index: 1;
+    /*height: var(--hq-layout-header-height);*/
+    flex-wrap: wrap;
+    line-height: 1.15rem;
+}
+/* #main-header a,
+#main-header a:hover {
+    text-decoration: none;
+    color: var(--main-text-color);
+} */
+#main-header h1 {
+    font-size: 1.15rem;
+    margin: 0;
+    /* padding: 6px 0 0 0; */
+}
+.spacer {
+    flex-grow: 1; 
+    display: block;
+    /*width: 20%;*/
+}
+.main-title {
+    display: block;
+    margin: 0 0 0 .5rem;
+    margin: 0;
+    width: 160px;
+    height: 43px;
+}
+#main-content {
+    overflow: auto;
+    width: 100vw;
+    min-height: inherit;
+}
+.drawer {
+    position: fixed;
+    top: 0;
+    height: 100vh;
+    width: 80vw;
+    overflow: auto;
+    transition: transform 200ms cubic-bezier(1,0,0,1);
+    transition: all 200ms ease-in-out;
+}
+#left-drawer.open, #right-drawer.open {
+    transform: translateX(0);
+    z-index: 2;
+}
+#left-drawer {
+    left: 0;
+    background: rgba(90,90,90,.90);
+    transform: translateX(-100%);    
+    display: flex;
+    flex-wrap: wrap;
+    z-index: 1;
+}
+#right-drawer {
+    right: 0;
+    /* background: rgba(2,12,103,0.1); */
+    /* background: rgba(255,255,255,0.1); */
+    background: #000;
+    transform: translateX(100%);
+    z-index: 1;
+}
+.modal {
+    /*height: 100vh;*/
+    width: 100vw;
+    max-width: 100%;
+    transform: translateX(-100vw);
+    position: fixed;
+    overflow: hidden;
+    z-index: 1;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    /* background: rgba(90,90,0,.25); */
+    background: rgba(200,200,200,.10);
+    opacity: 0;
+}
+.modal.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+#loading-modal {
+    display: flex;
+    justify-content: center;
+    transition: opacity 1000ms ease-in;
+}
+#loading-modal svg {
+    max-width: 10em;
+}
+#context-menu {
+    display: flex;
+    /*justify-content: space-between;*/
+    justify-content: flex-end;
+    width: 55%;
+    max-width: 200px;
+    height: 35px;
+}
+#context-menu.hidden {
+    display: none;
+}
+.context-menu-spacer {
+    border-right: 1px dotted #ccc;
+    margin: 0 5px;
+}
+
+
+
+@media screen
+    /* and (min-width: 500px) */
+    and (max-width: 500px) {
+    .padded {
+        padding: calc(var(--hq-layout-padding) / 2);
+    }
+}
+
+/**
+ * Left hand side menu is now fixed in place and hamburger goes away.
+*/
+@media screen
+    and (min-width: 500px) {
+
+    :host {
+        /* min-width: 700px; */
+        max-width: var(--max-screen);
+    }
+    #main-content {
+        display: flex;
+        align-items: stretch;
+    }
+    slot[name="main"] {
+        width: 1%;
+        display: block;
+        flex-grow: 1;
+        /* padding: 0 10px; */
+    }
+    /**
+     * FIXME: if we ever want to use the left-drawer, we'll need to uncomment
+     * the following:
+     */
+    /* #left-drawer {
+        width: auto;
+
+        transform: none;
+        z-index: inherit;
+        
+        position: inherit;
+        background: #555;
+        height: auto;
+        text-shadow: 0 0 2px #555;
+
+        overflow: hidden;
+
+        transition: width 150ms ease-in-out;
+    }
+    #left-drawer:hover {
+        width: 160px;
+    } */
+}
+
+@media screen and (min-width: 1366px) {
+    #header-wrapper.sticky {
+        box-shadow: none;
+        z-index: auto;
+        position: initial;
+        background: inherit;
+        transform: translateY(0px);
+        transition: none;
+    }
+}
+
+@media screen and (min-width: 700px) {
+    .drawer {
+        /* width: 555px; */
+        width: 30vw;
+        min-width: 300px;
+        max-width: 555px;
+    }
+}
+
+
+/**
+XXX: something to do with retina screens
+non-retina:
+and (-webkit-min-device-pixel-ratio: 1)
+retina:
+and (-webkit-min-device-pixel-ratio: 2)
+*/

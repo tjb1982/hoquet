@@ -1,0 +1,44 @@
+:host {
+    flex-grow: 1;
+    display: block;
+}
+nav {
+    color: var(--theme-ink-color);
+}
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 28px 0;
+    font-size: 1.25rem;
+    font-family: var(--theme-font-family);
+}
+nav > ul > li {
+    transition: background 200ms ease-in-out;
+    background: #000;
+    flex-grow: 1;
+}
+nav > ul > li:hover {
+    background: var(--theme-secondary-dark);
+    transition: background 200ms ease-in-out;
+}
+nav > ul .selected, nav > ul .selected:hover {
+    font-weight: bold;
+    background-color: var(--theme-secondary-dark-hover); /* ??? */
+    background: var(--theme-secondary-dark-hover);
+}
+nav > ul .selected i ~ span::after {
+    /*content: "*";*/
+}
+a {
+    color: white;
+    display: flex;
+    text-decoration: none;
+    padding: 12px 20px;
+}
+i.material-icons {
+    font-size: var(--icon-size);
+    padding-top: 2px;
+}
+i ~ span {
+    margin-left: 10px;
+}

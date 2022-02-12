@@ -1,0 +1,39 @@
+:host {
+    flex-grow: 1;
+    display: block;
+}
+ul {
+    display: flex;
+    width: 100%;
+    box-shadow: 0 0 10px #777;
+}
+ul li {
+    width: 25%;
+}
+li > a {
+    color: var(--main-text-color);
+    display: block;
+    padding: 10px;
+}
+i.material-icons {
+    display: block;
+    text-align: center;
+    font-size: 1.5rem;
+    font-size: 20pt;
+    padding: 4px;
+}
+i ~ span {
+    font-size: .8rem;
+    text-align: center;
+    display: block;
+    margin: 0;
+}
+nav > ul {
+    padding: 0;
+}
+nav > ul .selected i ~ span::after {
+    content: none;
+}
+nav > ul .selected {
+    font-weight: normal;
+}

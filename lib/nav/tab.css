@@ -1,0 +1,23 @@
+nav > ul {
+    background: #eee;
+    justify-content: flex-end;
+}
+nav > ul > li {
+    max-width: 100px;
+    flex-grow: 0;
+    margin: 5px 10px 0 0;
+    margin: 10px 10px 0 0;
+}
+ul > li a {
+    background: #ccc;
+    background: #eee;
+    border-radius: 10% 10% 0 0;
+    padding: 5px 0;
+}
+nav > ul .selected {
+    box-shadow: 0 -2px 3px #aaa;
+}
+nav > ul .selected {
+    font-weight: bold;
+    background: inherit;
+}

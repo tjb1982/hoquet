@@ -174,9 +174,16 @@ export default ((C = HTMLElement, {
                             rule => rule.cssText
                         ).join(" ")]);
                     });
+
+                    this.replace(container, ...styles, this.template);
+
+                    this.shadowRoot?.prepend(...Array.from(
+                        this.shadowRoot.querySelectorAll("link[rel='stylesheet']"))
+                    );
+                } else {
+                    this.replace(container, ...styles, this.template);
                 }
 
-                this.replace(container, ...styles, this.template);
 
                 if (!rendered) {
                     Object.defineProperty(this, "$", {

@@ -1,0 +1,68 @@
+.mdc-dialog .mdc-dialog__title {
+    color: var(--dialog-title-color);
+}
+
+.mdc-dialog .mdc-dialog__content {
+    color: var(--dialog-content-color);
+}
+
+.mdc-dialog a {
+    color: var(--dialog-anchor-color);
+}
+
+.mdc-dialog strong {
+    color: var(--dialog-strong-color);
+}
+
+.mdc-dialog .mdc-dialog__scrim {
+    background: var(--dialog-scrim-background);
+}
+
+.mdc-dialog .mdc-dialog__surface {
+    box-shadow: var(--dialog-box-shadow);
+}
+
+.mdc-dialog {
+    z-index: var(--dialog-z-index, 1001);
+}
+
+ul#action-list {
+    list-style: none outside none;
+    margin: 0;
+    padding: 20px 0 0 0;
+    display: flex;
+    flex-direction: column;
+}
+
+ul li {
+    margin: 5px 0 0 0;
+    width: 100%;
+    color: var(--dialog-content-color);
+}
+
+.button-container {
+    display: flex;
+}
+
+button {
+    border-radius: var(--button-border-radius);
+    background-color: var(--secondary-button-background-color);
+    /* --secondary-button-background-hover-color: #656565; */
+    color: var(--secondary-button-color);
+    border: var(--secondary-button-border);
+    transition: var(--base-transition);
+    width: 100%;
+    padding: var(--button-padding);
+}
+
+button:hover {
+    background-color: var(--secondary-button-background-hover-color);
+}
+
+button.primary {
+    background-color: var(--primary-button-background-color);
+    font-weight: bold;
+}
+button.primary:hover {
+    background-color: var(--primary-button-background-hover-color);
+}

@@ -1,0 +1,15 @@
+<label id="container" class="mdc-text-field mdc-text-field--filled">
+    <span class="mdc-text-field__ripple"></span>
+    <span class="mdc-floating-label" id="floating-label"><slot name="floating-label"></slot></span>
+    <span class="mdc-text-field__affix mdc-text-field__affix--prefix"><slot name="prefix"></slot></span>
+
+    <!-- <slot name="input"></slot>
+    <span id="input-placeholder"></span> -->
+    <input id="input" class="mdc-text-field__input" aria-labelledby="floating-label">
+    
+    <span class="mdc-text-field__affix mdc-text-field__affix--suffix"><slot name="suffix"></slot></span>
+    <span class="mdc-line-ripple"></span>
+</label>
+<div class="mdc-text-field-helper-line">
+    <div id="helper-text" class="mdc-text-field-helper-text" id="my-helper-id" aria-hidden="true"></div>
+</div>
