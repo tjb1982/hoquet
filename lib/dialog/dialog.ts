@@ -1,7 +1,7 @@
 import { MDCDialog } from "@material/dialog";
 
-import materialComponentsLink from "../../../material-components-link.html";
-import materialIconsLink from "../../../material-icons-link.html";
+import materialComponentsLink from "../html/material-components-link.html";
+import materialIconsLink from "../html/material-icons-link.html";
 import styles from "./dialog.css";
 
 import dialogTemplateSrc from "./dialog.html";

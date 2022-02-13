@@ -3,6 +3,3 @@ node_modules/
 *.swo
 .vscode
 scrap/
-dist/
-lib/**/*.js
-lib/**/*.d.ts

@@ -1,4 +1,4 @@
-import materialIcons from "../../material-icons-link.html";
+import materialIcons from "../html/material-icons-link.html";
 import stackStyles from "./stack.css";
 import flexStyles from "./flex.css";
 import tabStyles from "./tab.css";
@@ -35,6 +35,7 @@ export type MenuItem = {
     icon: string;
     href: string;
     selected?: boolean;
+    spa?: boolean;
 }
 
 const CONTENT = Symbol();
@@ -189,6 +190,13 @@ export default class Nav extends HTMLElement {
 
             $li.id = `menu-item__${item.name}`;
             $anchor.href = item.href;
+            if (item.spa) {
+                $anchor.addEventListener("click", e => {
+                    e.preventDefault();
+                    window.history.pushState({}, "", $anchor.href);
+                    window.dispatchEvent(new Event("popstate"));
+                });
+            }
             if (item.selected) {
                 $anchor.classList.add("selected");
             }

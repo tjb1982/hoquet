@@ -1,6 +1,6 @@
 import { Mutex, debounce } from "../utils";
 
-import materialIcons from "../../material-icons-link.html";
+import materialIcons from "../html/material-icons-link.html";
 
 import styles from "./layout.css";
 import html from "./layout.html";
