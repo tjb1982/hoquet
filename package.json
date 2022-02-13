@@ -1,6 +1,6 @@
 {
   "name": "@pojagi/hoquet",
-  "version": "9.0.0-SNAPSHOT.24",
+  "version": "9.0.0-SNAPSHOT.25",
   "description": "Web components framework",
   "repository": "git@github.com/tjb1982/hoquet.git",
   "author": "Tom Brennan <tjb1982@gmail.com>",
