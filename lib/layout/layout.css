@@ -19,7 +19,7 @@
     width: 100%;
     /* overflow: hidden; */
 
-    --max-screen: 1366px;
+    --hq-layout-max-screen: 1366px;
 }
 
 .padded {
@@ -198,7 +198,7 @@
 
     :host {
         /* min-width: 700px; */
-        max-width: var(--max-screen);
+        max-width: var(--hq-layout-max-screen);
     }
     #main-content {
         display: flex;

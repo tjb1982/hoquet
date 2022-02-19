@@ -1,29 +1,41 @@
+:host {
+    font-family: var(--hq-dialog-font-family);
+}
+
+/*
+FIXME: this is a hack only for the Imbue Network project. Better would be
+to use slots so that client code can control their own styling.
+*/
+:not(.mdc-deprecated-list-item--disabled).mdc-deprecated-list-item {
+    padding: 0;
+}
+
 .mdc-dialog .mdc-dialog__title {
-    color: var(--dialog-title-color);
+    color: var(--hq-dialog-title-color);
 }
 
 .mdc-dialog .mdc-dialog__content {
-    color: var(--dialog-content-color);
+    color: var(--hq-dialog-content-color);
 }
 
 .mdc-dialog a {
-    color: var(--dialog-anchor-color);
+    color: var(--hq-dialog-anchor-color);
 }
 
 .mdc-dialog strong {
-    color: var(--dialog-strong-color);
+    color: var(--hq-dialog-strong-color);
 }
 
 .mdc-dialog .mdc-dialog__scrim {
-    background: var(--dialog-scrim-background);
+    background: var(--hq-dialog-scrim-background);
 }
 
 .mdc-dialog .mdc-dialog__surface {
-    box-shadow: var(--dialog-box-shadow);
+    box-shadow: var(--hq-dialog-box-shadow);
 }
 
 .mdc-dialog {
-    z-index: var(--dialog-z-index, 1001);
+    z-index: var(--hq-dialog-z-index, 1001);
 }
 
 ul#action-list {
@@ -37,7 +49,7 @@ ul#action-list {
 ul li {
     margin: 5px 0 0 0;
     width: 100%;
-    color: var(--dialog-content-color);
+    color: var(--hq-dialog-content-color);
 }
 
 .button-container {
@@ -45,24 +57,25 @@ ul li {
 }
 
 button {
-    border-radius: var(--button-border-radius);
-    background-color: var(--secondary-button-background-color);
-    /* --secondary-button-background-hover-color: #656565; */
-    color: var(--secondary-button-color);
-    border: var(--secondary-button-border);
-    transition: var(--base-transition);
+    border-radius: var(--hq-button-border-radius, 3px);
+    background-color: var(--hq-secondary-button-background-color, inherit);
+    color: var(--hq-secondary-button-color);
+    border: var(--hq-secondary-button-border);
+    transition: var(--hq-base-transition);
     width: 100%;
-    padding: var(--button-padding);
-}
-
-button:hover {
-    background-color: var(--secondary-button-background-hover-color);
+    padding: var(--hq-button-padding, 10px);
+    font-size: var(--hq-button-font-size);
 }
 
 button.primary {
-    background-color: var(--primary-button-background-color);
+    background-color: var(--hq-primary-button-background-color);
     font-weight: bold;
 }
+
+button:hover {
+    background-color: var(--hq-secondary-button-background-hover-color);
+}
+
 button.primary:hover {
-    background-color: var(--primary-button-background-hover-color);
+    background-color: var(--hq-primary-button-background-hover-color);
 }
