@@ -41,7 +41,7 @@ export default ((C = HTMLElement, {
         ? function(id) { return this.shadowRoot.getElementById(id); }
         : function(id) { return this.querySelector(`#${id}`); };
 
-    class A extends (C) {
+    return new (class A extends (C) {
 
         constructor(...args) {
             super(...args);
@@ -210,8 +210,6 @@ export default ((C = HTMLElement, {
         adoptStyleSheets(...sources) {
             return !sources.length || _importStyleRules(this[CONTAINER_KEY], sources, shadowy);
         }
-    }
-
-    return A;
+    })
 });
 
